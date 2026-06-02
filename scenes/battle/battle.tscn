@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cw8adqsayx7bp"]
+[gd_scene format=3 uid="uid://x7w6iaphc40t"]
 
 [ext_resource type="Script" uid="uid://yhjnd1b07i16" path="res://scripts/battle/card_manager.gd" id="1_r0du0"]
 [ext_resource type="Script" path="res://scripts/core/game_manager.gd" id="7_gamemgr"]

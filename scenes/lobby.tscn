@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://blobby0000001"]
+[gd_scene format=3 uid="uid://ws2k7cabe6g3"]
 
 [ext_resource type="Script" path="res://scripts/core/lobby_screen.gd" id="1_lobby"]
 

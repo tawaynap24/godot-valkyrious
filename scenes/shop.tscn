@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://shop00001"]
+[gd_scene format=3 uid="uid://cl1jdy2tipt3d"]
 
 [ext_resource type="Script" uid="uid://shopscr001" path="res://scripts/core/shop_screen.gd" id="1_shop"]
 

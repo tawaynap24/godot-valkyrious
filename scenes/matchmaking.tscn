@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c0h3oc12c74gq"]
+[gd_scene format=3 uid="uid://dvt7dabv7f271"]
 
 [ext_resource type="Script" uid="uid://b3hqjffct023y" path="res://scripts/core/matchmaking_screen.gd" id="1_mm"]
 

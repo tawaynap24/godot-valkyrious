@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://7v3qbuqvu6lp"]
+[gd_scene format=3 uid="uid://4uv8r4jv4ros"]
 
 [ext_resource type="Script" uid="uid://beb47jdyx7cow" path="res://scripts/battle/card.gd" id="1_3p273"]
 [ext_resource type="Script" path="res://scripts/battle/countdown_circle.gd" id="3_ccircle"]
