@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bf1sxnqpsjxqy"]
 
-[ext_resource type="Script" path="res://scripts/core/CollectionScreen.gd" id="1_coll"]
+[ext_resource type="Script" path="res://scripts/core/collection_screen.gd" id="1_coll"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.18, 0.48, 0.92, 1.0)

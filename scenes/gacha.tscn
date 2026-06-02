@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://gacha00001"]
 
-[ext_resource type="Script" uid="uid://ddjyeew0xajob" path="res://scripts/core/GachaScreen.gd" id="1_gacha"]
+[ext_resource type="Script" uid="uid://ddjyeew0xajob" path="res://scripts/core/gacha_screen.gd" id="1_gacha"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.18, 0.08, 0.4, 1)

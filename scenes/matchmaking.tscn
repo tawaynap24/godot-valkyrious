@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c0h3oc12c74gq"]
 
-[ext_resource type="Script" uid="uid://b3hqjffct023y" path="res://scripts/core/MatchmakingScreen.gd" id="1_mm"]
+[ext_resource type="Script" uid="uid://b3hqjffct023y" path="res://scripts/core/matchmaking_screen.gd" id="1_mm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.18, 0.48, 0.92, 1)

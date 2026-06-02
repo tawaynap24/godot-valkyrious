@@ -33,7 +33,7 @@ func _run_initial_preload() -> void:
 	$ProgressBar.value = 5.0
 	await get_tree().process_frame
 
-	GameCache.CARD_SCENE = load("res://scenes/battle/Card.tscn")
+	GameCache.CARD_SCENE = load("res://scenes/battle/card.tscn")
 	$ProgressBar.value = 15.0
 	await get_tree().process_frame
 

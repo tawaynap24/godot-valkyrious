@@ -8,16 +8,16 @@ extends Node
 #   SceneManager.load_scene("res://scenes/SomeScene.tscn")
 # ─────────────────────────────────────────────────────────────────────────────
 
-const SPLASH_SCENE        = "res://scenes/Splash.tscn"
-const LOADING_SCENE       = "res://scenes/Loading.tscn"
-const LOBBY_SCENE         = "res://scenes/Lobby.tscn"
-const BATTLE_SCENE        = "res://scenes/battle/Battle.tscn"
-const DECK_BUILDER_SCENE  = "res://scenes/DeckBuilder.tscn"
-const COLLECTION_SCENE    = "res://scenes/Collection.tscn"
-const GACHA_SCENE         = "res://scenes/Gacha.tscn"
-const MATCHMAKING_SCENE   = "res://scenes/Matchmaking.tscn"
-const SHOP_SCENE          = "res://scenes/Shop.tscn"
-const RECORDS_SCENE       = "res://scenes/Records.tscn"
+const SPLASH_SCENE        = "res://scenes/splash.tscn"
+const LOADING_SCENE       = "res://scenes/loading.tscn"
+const LOBBY_SCENE         = "res://scenes/lobby.tscn"
+const BATTLE_SCENE        = "res://scenes/battle/battle.tscn"
+const DECK_BUILDER_SCENE  = "res://scenes/deck_builder.tscn"
+const COLLECTION_SCENE    = "res://scenes/collection.tscn"
+const GACHA_SCENE         = "res://scenes/gacha.tscn"
+const MATCHMAKING_SCENE   = "res://scenes/matchmaking.tscn"
+const SHOP_SCENE          = "res://scenes/shop.tscn"
+const RECORDS_SCENE       = "res://scenes/records.tscn"
 
 ## Set before loading the battle scene so GameManager knows which mode to run.
 ## Values: "ai" | "online"

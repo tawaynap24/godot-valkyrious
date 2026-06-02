@@ -11,18 +11,18 @@ config_version=5
 [application]
 
 config/name="Valkyrious Revive"
-run/main_scene="res://scenes/Splash.tscn"
+run/main_scene="res://scenes/splash.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 
 [autoload]
 
-CardDatabase="*res://scripts/autoload/CardDatabase.gd"
-SceneManager="*res://scripts/autoload/SceneManager.gd"
-SaveManager="*res://scripts/autoload/SaveManager.gd"
-GameCache="*res://scripts/autoload/GameCache.gd"
-NetworkManager="*res://scripts/autoload/NetworkManager.gd"
-BattleLogger="*res://scripts/autoload/BattleLogger.gd"
-UIShell="*res://scripts/autoload/UIShell.gd"
+CardDatabase="*res://scripts/autoload/card_database.gd"
+SceneManager="*res://scripts/autoload/scene_manager.gd"
+SaveManager="*res://scripts/autoload/save_manager.gd"
+GameCache="*res://scripts/autoload/game_cache.gd"
+NetworkManager="*res://scripts/autoload/network_manager.gd"
+BattleLogger="*res://scripts/autoload/battle_logger.gd"
+UIShell="*res://scripts/autoload/ui_shell.gd"
 
 [display]
 

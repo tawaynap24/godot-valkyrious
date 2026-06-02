@@ -33,7 +33,7 @@ func _add_pause(duration: float) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	child_entered_tree.connect(_on_card_child_entered)
-	skill_resolver = preload("res://scripts/battle/SkillResolver.gd").new()
+	skill_resolver = preload("res://scripts/battle/skill_resolver.gd").new()
 	add_child(skill_resolver)
 	screen_size = get_viewport_rect().size
 	player_hand_reference = $"../PlayerHand"

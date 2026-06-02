@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://blobby0000001"]
 
-[ext_resource type="Script" path="res://scripts/core/LobbyScreen.gd" id="1_lobby"]
+[ext_resource type="Script" path="res://scripts/core/lobby_screen.gd" id="1_lobby"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_battle_n"]
 bg_color = Color(0.18, 0.48, 0.92, 1.0)

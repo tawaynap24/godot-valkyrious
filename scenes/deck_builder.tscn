@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://clnp0c8cakv65"]
 
-[ext_resource type="Script" uid="uid://cj7lwtvdrsab1" path="res://scripts/core/DeckBuilderScreen.gd" id="1_dbscreen"]
+[ext_resource type="Script" uid="uid://cj7lwtvdrsab1" path="res://scripts/core/deck_builder_screen.gd" id="1_dbscreen"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.18, 0.48, 0.92, 1)

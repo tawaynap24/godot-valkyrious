@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://c05xi5aljjxj3"]
 
-[ext_resource type="Script" uid="uid://yhjnd1b07i16" path="res://scripts/battle/CardManager.gd" id="1_r0du0"]
-[ext_resource type="PackedScene" uid="uid://bg117bx07i786" path="res://scenes/battle/CardSlot.tscn" id="2_cm0pq"]
-[ext_resource type="Script" uid="uid://c2k5iajiml83h" path="res://scripts/battle/PlayHand.gd" id="3_fos0i"]
+[ext_resource type="Script" uid="uid://yhjnd1b07i16" path="res://scripts/battle/card_manager.gd" id="1_r0du0"]
+[ext_resource type="PackedScene" uid="uid://bg117bx07i786" path="res://scenes/battle/card_slot.tscn" id="2_cm0pq"]
+[ext_resource type="Script" uid="uid://c2k5iajiml83h" path="res://scripts/battle/play_hand.gd" id="3_fos0i"]
 [ext_resource type="Texture2D" uid="uid://bmn8nw4stbci1" path="res://assets/general/Deck.png" id="4_cm0pq"]
-[ext_resource type="Script" uid="uid://cyjygbm3qmq8j" path="res://scripts/battle/Deck.gd" id="4_fos0i"]
-[ext_resource type="Script" uid="uid://drespjrf2laby" path="res://scripts/battle/InputManager.gd" id="6_3dxm6"]
-[ext_resource type="Script" uid="uid://4hg3wl1fb5fp" path="res://scripts/core/GameManager.gd" id="7_gamemgr"]
-[ext_resource type="Script" uid="uid://xsu3jnr55cm4" path="res://scripts/core/IntroCountdown.gd" id="8_intro"]
-[ext_resource type="Script" uid="uid://cqn1wo82koqnf" path="res://scripts/battle/EnemyAI.gd" id="9_enemyai"]
+[ext_resource type="Script" uid="uid://cyjygbm3qmq8j" path="res://scripts/battle/deck.gd" id="4_fos0i"]
+[ext_resource type="Script" uid="uid://drespjrf2laby" path="res://scripts/battle/input_manager.gd" id="6_3dxm6"]
+[ext_resource type="Script" uid="uid://4hg3wl1fb5fp" path="res://scripts/core/game_manager.gd" id="7_gamemgr"]
+[ext_resource type="Script" uid="uid://xsu3jnr55cm4" path="res://scripts/core/intro_countdown.gd" id="8_intro"]
+[ext_resource type="Script" uid="uid://cqn1wo82koqnf" path="res://scripts/battle/enemy_ai.gd" id="9_enemyai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fos0i"]
 size = Vector2(99.5, 162.5)
