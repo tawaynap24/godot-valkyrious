@@ -56,7 +56,7 @@ const HOLD_DRAG_THRESHOLD: float = 10.0
 # highlights without destroying and recreating all nodes
 var _collection_btn_map: Dictionary = {}
 var _sorted_owned_cards: Array[String] = []
-var _detail_card_id: String = ""
+var _detail_card_index: int = -1
 
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
@@ -88,10 +88,13 @@ func _connect_signals() -> void:
 	$ActionBar/SaveBtn.pressed.connect(_on_save)
 	$ActionBar/CancelBtn.pressed.connect(_on_cancel_edit)
 	$HoldTimer.timeout.connect(_on_hold_complete)
-	$DetailOverlay/CloseBtn.pressed.connect(_on_close_detail)
-	$DetailOverlay/CardPanel/UpgradeBtn.pressed.connect(_on_upgrade_pressed)
-	# Tap outside detail overlay (on Dim) to close
-	$DetailOverlay/Dim.gui_input.connect(_on_dim_input)
+	$DetailOverlay/MainDetailView/LeftBtn.pressed.connect(_on_prev_character)
+	$DetailOverlay/MainDetailView/RightBtn.pressed.connect(_on_next_character)
+	$DetailOverlay/MainDetailView/BottomBar/BackBtn.pressed.connect(_on_close_detail)
+	$DetailOverlay/MainDetailView/BottomBar/UpgradeBtn.pressed.connect(_on_open_upgrade_dialog)
+	$DetailOverlay/MainDetailView/BottomBar/JoinTeamBtn.pressed.connect(_on_join_team_pressed)
+	$DetailOverlay/UpgradeDialog/DialogPanel/LevelUpBtn.pressed.connect(_on_level_up_pressed)
+	$DetailOverlay/UpgradeDialog/CloseDialogBtn.pressed.connect(_on_close_upgrade_dialog)
 	# Deck slot tap-to-remove
 	var _dg: GridContainer = $DeckGrid
 	for _i in range(DECK_SIZE):
@@ -348,9 +351,9 @@ func _on_card_gui_input(event: InputEvent, button_index: int, card_id: String) -
 				_held_button_index = -1
 
 func _on_hold_complete() -> void:
-	if _held_card_id != "":
+	if _held_button_index != -1:
 		_hold_triggered = true
-		_show_detail(_held_card_id)
+		_show_detail(_held_button_index)
 
 func _on_deck_slot_input(event: InputEvent, slot_index: int) -> void:
 	if slot_index >= _working_deck.size():
@@ -363,17 +366,36 @@ func _on_deck_slot_input(event: InputEvent, slot_index: int) -> void:
 
 # ── Card Detail Overlay ───────────────────────────────────────────────────────
 
-func _show_detail(card_id: String) -> void:
+# Character-specific skill translations to make it look premium
+const SKILL_INFO := {
+	"death_burst_ange": {
+		"name": "✨ ระเบิดพลีชีพ",
+		"desc": "เมื่อถูกกำจัด จะสร้างความเสียหาย 4 หน่วยแก่ศัตรูทั้งหมด"
+	},
+	"stun_lowest_countdown": {
+		"name": "✨ คลื่นช็อกเวฟ",
+		"desc": "ทำให้ศัตรูที่มีคูลดาวน์เคลื่อนไหวต่ำสุด ติดสถานะมึนงง"
+	},
+	"stun_enemy": {
+		"name": "✨ หมัดอัมพาต",
+		"desc": "ทำให้ศัตรูที่ถูกโจมตีติดสถานะมึนงง"
+	},
+	"benita": {
+		"name": "✨ ระเบิดโทสะ",
+		"desc": "เมื่อได้รับความเสียหาย จะมอบพลังโจมตี +2 แก่ตนเอง"
+	}
+}
+
+func _show_detail(card_index: int) -> void:
 	UIShell.hide_shell()
-	_detail_card_id = card_id
+	_detail_card_index = card_index
+	var card_id: String = _sorted_owned_cards[card_index]
 	var data: Dictionary = CardDatabase.get_effective_dict(card_id)
 	if data.is_empty():
 		return
 
-	var rarity: int = clampi(data.get("rarity", 0), 0, CardDatabase.RARITY_COLORS.size() - 1)
-
 	# Artwork
-	var art: TextureRect = $DetailOverlay/CardPanel/ArtworkRect
+	var art: TextureRect = $DetailOverlay/MainDetailView/ArtworkRect
 	if data.get("has_image", false):
 		var tex := _try_load_texture(data.get("image_path", ""))
 		if tex:
@@ -384,132 +406,193 @@ func _show_detail(card_id: String) -> void:
 	else:
 		art.visible = false
 
-	$DetailOverlay/CardPanel/NameLabel.text   = data.get("name", card_id)
-
-	var r_lbl: Label = $DetailOverlay/CardPanel/RarityLabel
-	r_lbl.text = "◆  " + CardDatabase.RARITY_NAMES[rarity]
-	r_lbl.add_theme_color_override("font_color", CardDatabase.RARITY_COLORS[rarity])
-
-	$DetailOverlay/CardPanel/StatsLabel.text = (
-		"⚔ ATK  " + str(data.get("atk", "?"))
-		+ "    ❤ HP  " + str(data.get("hp", "?"))
-		+ "    💰 Cost  " + str(data.get("cost", "?"))
-	)
-
-	var desc: String = data.get("description", "")
-	$DetailOverlay/CardPanel/DescLabel.text = desc if desc != "" else "No description yet."
-
-	var skills: Array = data.get("skills", [])
-	var skills_text: String = "—"
-	if not skills.is_empty():
-		var parts := PackedStringArray()
-		for s in skills:
-			parts.append(str(s))
-		skills_text = "  •  ".join(parts)
-	$DetailOverlay/CardPanel/SkillsLabel.text = "Skills:  " + skills_text
-
-	# Refresh upgrade table (Level 5 down to 2, bottom to top)
-	var table: VBoxContainer = $DetailOverlay/CardPanel/UpgradeTable
-	for child in table.get_children():
-		child.queue_free()
-		
+	# Name & Level
 	var current_level: int = SaveManager.get_character_level(card_id)
+	var char_name: String = data.get("name", card_id)
 	
-	# Render 4 rows: from lvl 5 (top) down to 2 (bottom)
-	for lvl in range(5, 1, -1):
-		var row := PanelContainer.new()
-		row.custom_minimum_size = Vector2(400, 42)
-		
-		var sbf_row := StyleBoxFlat.new()
-		sbf_row.set_corner_radius_all(4)
-		if lvl <= current_level:
-			sbf_row.bg_color = Color(0.1, 0.45, 0.25, 0.18) # Unlocked (green)
-			sbf_row.border_color = Color(0.1, 0.45, 0.25, 0.6)
-			sbf_row.border_width_bottom = 1
-		elif lvl == current_level + 1:
-			sbf_row.bg_color = Color(0.72, 0.5, 0.05, 0.18) # Next (yellow/orange)
-			sbf_row.border_color = Color(0.72, 0.5, 0.05, 0.6)
-			sbf_row.border_width_bottom = 1
-		else:
-			sbf_row.bg_color = Color(0.25, 0.25, 0.25, 0.1) # Locked (grey)
-			sbf_row.border_color = Color(0.25, 0.25, 0.25, 0.25)
-			sbf_row.border_width_bottom = 1
-		row.add_theme_stylebox_override("panel", sbf_row)
-		
-		var margin := MarginContainer.new()
-		margin.add_theme_constant_override("margin_left", 12)
-		margin.add_theme_constant_override("margin_right", 12)
-		row.add_child(margin)
-		
-		var hbox := HBoxContainer.new()
-		margin.add_child(hbox)
-		
-		var lvl_lbl := Label.new()
-		lvl_lbl.text = "Level " + str(lvl)
-		lvl_lbl.add_theme_font_size_override("font_size", 12)
-		lvl_lbl.add_theme_color_override("font_color", Color(0.08, 0.14, 0.35, 1))
-		hbox.add_child(lvl_lbl)
-		
-		var spacer := Control.new()
-		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		hbox.add_child(spacer)
-		
-		var status_lbl := Label.new()
-		if lvl <= current_level:
-			status_lbl.text = "✓ Unlocked"
-			status_lbl.add_theme_color_override("font_color", Color(0.1, 0.62, 0.25, 1))
-		elif lvl == current_level + 1:
-			status_lbl.text = "Next (Cost: " + str(10 * lvl) + " coins)"
-			status_lbl.add_theme_color_override("font_color", Color(0.72, 0.5, 0.05, 1))
-		else:
-			status_lbl.text = "🔒 Locked"
-			status_lbl.add_theme_color_override("font_color", Color(0.45, 0.55, 0.70, 1))
-		status_lbl.add_theme_font_size_override("font_size", 12)
-		hbox.add_child(status_lbl)
-		
-		table.add_child(row)
+	# Try translating card name to Thai for UI aesthetics
+	var thai_names := {
+		"benita": "เบนิต้า",
+		"ange": "แอนจ์",
+		"ariana": "อารีอานา",
+		"nicole": "นิโคล",
+		"ran": "รัน",
+		"sia": "เซีย",
+		"victoria": "วิคตอเรีย",
+		"jenny": "เจนนี่"
+	}
+	var display_name: String = thai_names.get(card_id.to_lower(), char_name)
+	$DetailOverlay/MainDetailView/InfoPanel/LevelNameLabel.text = "Lv." + str(current_level) + " " + display_name
 
-	# Upgrade Button state
-	var up_btn: Button = $DetailOverlay/CardPanel/UpgradeBtn
-	if current_level >= SaveManager.UPGRADE_MAX_LEVEL:
-		up_btn.disabled = true
-		up_btn.text = "Max Level"
-	else:
-		var cost = 10 * (current_level + 1)
-		up_btn.disabled = SaveManager.get_coins() < cost
-		up_btn.text = "Upgrade (Cost: " + str(cost) + ")"
-		
-	var sbf_up := StyleBoxFlat.new()
-	sbf_up.set_corner_radius_all(6)
-	if up_btn.disabled:
-		sbf_up.bg_color = Color(0.45, 0.55, 0.70, 1.0)
-	else:
-		sbf_up.bg_color = Color(0.10, 0.62, 0.25, 1.0)
-	up_btn.add_theme_stylebox_override("normal", sbf_up)
-	up_btn.add_theme_stylebox_override("hover", sbf_up)
-	up_btn.add_theme_stylebox_override("pressed", sbf_up)
-	up_btn.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	# Stats
+	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/CostBox/Val.text = str(data.get("cost", "?"))
+	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/AtkBox/Val.text = str(data.get("atk", "?"))
+	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/HpBox/Val.text = str(data.get("hp", "?"))
 
+	# Skill Name & Desc
+	var skill_id: String = ""
+	var skills: Array = data.get("skills", [])
+	if not skills.is_empty():
+		skill_id = str(skills[0])
+	
+	# Look up translation or use fallback
+	var sk_name: String = "✨ ไม่มีสกิล"
+	var sk_desc: String = "ฮีโร่ตัวนี้ไม่มีสกิลติดตัว"
+	
+	if SKILL_INFO.has(skill_id):
+		sk_name = SKILL_INFO[skill_id]["name"]
+		sk_desc = SKILL_INFO[skill_id]["desc"]
+	elif SKILL_INFO.has(card_id):
+		sk_name = SKILL_INFO[card_id]["name"]
+		sk_desc = SKILL_INFO[card_id]["desc"]
+	elif skill_id != "":
+		sk_name = "✨ " + skill_id
+		sk_desc = "คำอธิบายสำหรับสกิล " + skill_id
+		
+	$DetailOverlay/MainDetailView/InfoPanel/SkillPanel/SkillName.text = sk_name
+	$DetailOverlay/MainDetailView/InfoPanel/SkillPanel/SkillDesc.text = sk_desc
+
+	# Enable/Disable character navigation arrows
+	$DetailOverlay/MainDetailView/LeftBtn.disabled = (_detail_card_index <= 0)
+	$DetailOverlay/MainDetailView/RightBtn.disabled = (_detail_card_index >= _sorted_owned_cards.size() - 1)
+
+	# Join/Leave Team Button Text & Style
+	_refresh_join_team_btn(card_id)
+
+	# Make detail overlay visible (ensure UpgradeDialog is closed by default)
+	$DetailOverlay/UpgradeDialog.visible = false
 	$DetailOverlay.visible = true
 
-func _on_upgrade_pressed() -> void:
-	if _detail_card_id == "":
+func _refresh_join_team_btn(card_id: String) -> void:
+	var join_btn := $DetailOverlay/MainDetailView/BottomBar/JoinTeamBtn
+	var is_in_deck: bool = _working_deck.has(str(_detail_card_index))
+	
+	if is_in_deck:
+		join_btn.text = "ออกจากทีม"
+	else:
+		join_btn.text = "เข้าร่วมทีม"
+		
+	# Disable if name is already taken or deck is full
+	var name_taken = _deck_has_name(card_id) and not is_in_deck
+	var deck_full = _working_deck.size() >= DECK_SIZE and not is_in_deck
+	join_btn.disabled = name_taken or deck_full
+
+func _on_prev_character() -> void:
+	if _detail_card_index > 0:
+		_show_detail(_detail_card_index - 1)
+
+func _on_next_character() -> void:
+	if _detail_card_index < _sorted_owned_cards.size() - 1:
+		_show_detail(_detail_card_index + 1)
+
+func _on_join_team_pressed() -> void:
+	if _detail_card_index == -1:
 		return
-	if SaveManager.upgrade_character(_detail_card_id):
-		_show_detail(_detail_card_id)
+	var card_id: String = _sorted_owned_cards[_detail_card_index]
+	_toggle_collection_card(_detail_card_index, card_id)
+	_refresh_join_team_btn(card_id)
+
+func _on_open_upgrade_dialog() -> void:
+	$DetailOverlay/UpgradeDialog.visible = true
+	_refresh_upgrade_dialog()
+
+func _on_close_upgrade_dialog() -> void:
+	$DetailOverlay/UpgradeDialog.visible = false
+
+func _refresh_upgrade_dialog() -> void:
+	if _detail_card_index == -1:
+		return
+	var card_id: String = _sorted_owned_cards[_detail_card_index]
+	var data: Dictionary = CardDatabase.get_effective_dict(card_id)
+	if data.is_empty():
+		return
+		
+	# Banner artwork
+	var banner := $DetailOverlay/UpgradeDialog/DialogPanel/BannerRect
+	if data.get("has_image", false):
+		banner.texture = _try_load_texture(data.get("image_path", ""))
+		banner.visible = true
+	else:
+		banner.visible = false
+
+	# Title Box Status
+	var current_level: int = SaveManager.get_character_level(card_id)
+	var title_lbl := $DetailOverlay/UpgradeDialog/DialogPanel/TitleBox/TitleLbl
+	if current_level >= 5:
+		title_lbl.text = "TITLE\n🔓 Unlocked"
+	else:
+		title_lbl.text = "TITLE\n🔒 Locked"
+
+	# Build upgrade table rows (Levels 5 down to 2)
+	var table := $DetailOverlay/UpgradeDialog/DialogPanel/UpgradeTable
+	for child in table.get_children():
+		child.queue_free()
+
+	for lvl in range(5, 1, -1):
+		var row := Panel.new()
+		row.custom_minimum_size = Vector2(432, 40)
+		
+		var sbf := StyleBoxFlat.new()
+		sbf.set_corner_radius_all(6)
+		
+		var text_color: Color
+		if lvl <= current_level:
+			# Unlocked: Dark Slate Blue
+			sbf.bg_color = Color(0.18, 0.28, 0.48, 1.0)
+			text_color = Color(1.0, 1.0, 1.0)
+		elif lvl == current_level + 1:
+			# Active / Next Level: Vibrant Cyan-Blue
+			sbf.bg_color = Color(0.12, 0.48, 0.92, 1.0)
+			text_color = Color(1.0, 1.0, 1.0)
+		else:
+			# Locked / Higher Levels: Muted Gray-Blue
+			sbf.bg_color = Color(0.85, 0.88, 0.92, 0.6)
+			text_color = Color(0.5, 0.55, 0.65)
+			
+		row.add_theme_stylebox_override("panel", sbf)
+		
+		var lbl := Label.new()
+		lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.add_theme_font_size_override("font_size", 13)
+		lbl.add_theme_color_override("font_color", text_color)
+		
+		var boost_desc = "❤️ Life +1" if lvl == 5 else "⚡ Ability +1"
+		lbl.text = "Lv. " + str(lvl) + "   |   " + boost_desc
+		
+		row.add_child(lbl)
+		table.add_child(row)
+
+	# Level Up Button and Cost display
+	var level_up_btn := $DetailOverlay/UpgradeDialog/DialogPanel/LevelUpBtn
+	var cost_lbl := $DetailOverlay/UpgradeDialog/DialogPanel/CostHBox/CostLbl
+	
+	if current_level >= SaveManager.UPGRADE_MAX_LEVEL:
+		cost_lbl.text = "Max Level"
+		level_up_btn.disabled = true
+		level_up_btn.text = "MAX LEVEL"
+	else:
+		var cost = 10 * (current_level + 1)
+		cost_lbl.text = "💰 " + str(cost)
+		level_up_btn.disabled = SaveManager.get_coins() < cost
+		level_up_btn.text = "LEVEL UP"
+
+func _on_level_up_pressed() -> void:
+	if _detail_card_index == -1:
+		return
+	var card_id: String = _sorted_owned_cards[_detail_card_index]
+	if SaveManager.upgrade_character(card_id):
+		# Re-render Detail UI and Dialog with new level
 		UIShell.refresh_coins()
+		_show_detail(_detail_card_index)
+		_refresh_upgrade_dialog()
 		_build_collection_grid()
 		_refresh_deck_ui()
 
 func _on_close_detail() -> void:
 	$DetailOverlay.visible = false
 	UIShell.show_shell()
-
-func _on_dim_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		_on_close_detail()
-	elif event is InputEventScreenTouch and event.pressed:
-		_on_close_detail()
 
 # ── Collection Highlight Refresh ─────────────────────────────────────────────
 # Updates border colour, badge and dimming on existing collection buttons.
