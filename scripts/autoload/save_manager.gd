@@ -122,6 +122,9 @@ func _load() -> void:
 		var loaded = ResourceLoader.load(SAVE_PATH)
 		if loaded is PlayerData:
 			data = loaded
+			if data.coins <= 0:
+				data.coins = 1000000
+				_save()
 			_migrate_deck_keys()
 			_migrate_to_v2()
 			return
