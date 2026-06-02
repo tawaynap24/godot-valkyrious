@@ -1,0 +1,583 @@
+[gd_scene format=3 uid="uid://clnp0c8cakv65"]
+
+[ext_resource type="Script" uid="uid://cj7lwtvdrsab1" path="res://scripts/core/DeckBuilderScreen.gd" id="1_dbscreen"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.18, 0.48, 0.92, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_n"]
+bg_color = Color(0.1, 0.35, 0.78, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_h"]
+bg_color = Color(0.08, 0.25, 0.6, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selector_bar"]
+bg_color = Color(0.85, 0.93, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_empty"]
+bg_color = Color(0.95, 0.97, 1, 1)
+border_width_bottom = 2
+border_color = Color(0.72, 0.84, 0.96, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_collection_bg"]
+bg_color = Color(0.88, 0.94, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail_panel"]
+bg_color = Color(0.96, 0.98, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.75, 0.95, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_n"]
+bg_color = Color(0.88, 0.16, 0.16, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_h"]
+bg_color = Color(0.65, 0.1, 0.1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="DeckBuilder" type="Node2D" unique_id=1173746529]
+script = ExtResource("1_dbscreen")
+
+[node name="Background" type="ColorRect" parent="." unique_id=920290515]
+offset_right = 576.0
+offset_bottom = 922.0
+color = Color(9.62615e-08, 0.44627196, 0.6753574, 1)
+
+[node name="TopBar" type="Panel" parent="." unique_id=1248484743]
+visible = false
+offset_right = 576.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="BackButton" type="Button" parent="TopBar" unique_id=249365343]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 90.0
+offset_bottom = 55.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_back_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back_h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back_h")
+text = "โ Back"
+
+[node name="TitleLabel" type="Label" parent="TopBar" unique_id=275717008]
+layout_mode = 0
+offset_right = 576.0
+offset_bottom = 66.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Deck Builder"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DeckSelectorBar" type="Panel" parent="." unique_id=1503273321]
+offset_right = 576.0
+offset_bottom = 44.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selector_bar")
+
+[node name="Deck1Btn" type="Button" parent="DeckSelectorBar" unique_id=1791926918]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 194.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 15
+text = "Deck 1"
+
+[node name="Deck2Btn" type="Button" parent="DeckSelectorBar" unique_id=503969725]
+layout_mode = 0
+offset_left = 198.0
+offset_top = 6.0
+offset_right = 384.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 15
+text = "Deck 2"
+
+[node name="Deck3Btn" type="Button" parent="DeckSelectorBar" unique_id=240955809]
+layout_mode = 0
+offset_left = 388.0
+offset_top = 6.0
+offset_right = 568.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 15
+text = "Deck 3"
+
+[node name="ActionBar" type="Control" parent="." unique_id=1088288254]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 190.0
+offset_top = 420.0
+offset_right = 342.0
+offset_bottom = 454.0
+
+[node name="SetActiveBtn" type="Button" parent="ActionBar" unique_id=1191668160]
+layout_mode = 0
+offset_left = 41.0
+offset_right = 151.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Set Active"
+
+[node name="SaveBtn" type="Button" parent="ActionBar" unique_id=44818922]
+visible = false
+layout_mode = 0
+offset_left = 284.0
+offset_top = 4.0
+offset_right = 422.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Save"
+
+[node name="CancelBtn" type="Button" parent="ActionBar" unique_id=1462221295]
+visible = false
+layout_mode = 0
+offset_left = 426.0
+offset_top = 4.0
+offset_right = 568.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Cancel"
+
+[node name="DeckGrid" type="GridContainer" parent="." unique_id=1101292006]
+offset_left = 4.0
+offset_top = 51.0
+offset_right = 572.0
+offset_bottom = 423.0
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+columns = 4
+
+[node name="DeckSlot0" type="Panel" parent="DeckGrid" unique_id=1882108119]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot0" unique_id=729887552]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot0" unique_id=1068395472]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot1" type="Panel" parent="DeckGrid" unique_id=1573590314]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot1" unique_id=136166244]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot1" unique_id=2070217972]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot2" type="Panel" parent="DeckGrid" unique_id=1329891571]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot2" unique_id=439501941]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot2" unique_id=1583038540]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot3" type="Panel" parent="DeckGrid" unique_id=1754518731]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot3" unique_id=1381323172]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot3" unique_id=99588709]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot4" type="Panel" parent="DeckGrid" unique_id=194883701]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot4" unique_id=1551001531]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot4" unique_id=1842676646]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot5" type="Panel" parent="DeckGrid" unique_id=696629138]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot5" unique_id=1100855945]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot5" unique_id=1093074498]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot6" type="Panel" parent="DeckGrid" unique_id=1376331885]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot6" unique_id=1546273752]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot6" unique_id=1405640686]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DeckSlot7" type="Panel" parent="DeckGrid" unique_id=1184458534]
+clip_contents = true
+custom_minimum_size = Vector2(138, 180)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_slot_empty")
+
+[node name="ArtworkRect" type="TextureRect" parent="DeckGrid/DeckSlot7" unique_id=1802445755]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 2
+
+[node name="CardLabel" type="Label" parent="DeckGrid/DeckSlot7" unique_id=1431220705]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -38.0
+offset_right = -28.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.7, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 11
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="CollectionScroll" type="ScrollContainer" parent="." unique_id=1368940176]
+offset_left = 8.0
+offset_top = 463.0
+offset_right = 568.0
+offset_bottom = 913.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_collection_bg")
+
+[node name="CollectionGrid" type="GridContainer" parent="CollectionScroll" unique_id=150467849]
+custom_minimum_size = Vector2(552, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+columns = 4
+
+[node name="HoldTimer" type="Timer" parent="." unique_id=1117017461]
+wait_time = 0.5
+one_shot = true
+
+[node name="DetailOverlay" type="Control" parent="." unique_id=581416743]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 576.0
+offset_bottom = 922.0
+
+[node name="Dim" type="ColorRect" parent="DetailOverlay" unique_id=1391367678]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="CardPanel" type="Panel" parent="DetailOverlay" unique_id=1120468187]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 160.0
+offset_right = 488.0
+offset_bottom = 660.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_detail_panel")
+
+[node name="ArtworkRect" type="TextureRect" parent="DetailOverlay/CardPanel" unique_id=342504261]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 200.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="DetailOverlay/CardPanel" unique_id=1095029091]
+layout_mode = 0
+offset_top = 208.0
+offset_right = 400.0
+offset_bottom = 251.0
+theme_override_colors/font_color = Color(0.08, 0.14, 0.35, 1)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RarityLabel" type="Label" parent="DetailOverlay/CardPanel" unique_id=479117756]
+layout_mode = 0
+offset_top = 254.0
+offset_right = 400.0
+offset_bottom = 281.0
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="DetailOverlay/CardPanel" unique_id=1920748860]
+layout_mode = 0
+offset_top = 284.0
+offset_right = 400.0
+offset_bottom = 318.0
+theme_override_colors/font_color = Color(0.12, 0.22, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescLabel" type="Label" parent="DetailOverlay/CardPanel" unique_id=692346598]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 322.0
+offset_right = 384.0
+offset_bottom = 420.0
+theme_override_colors/font_color = Color(0.3, 0.38, 0.55, 1)
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="SkillsLabel" type="Label" parent="DetailOverlay/CardPanel" unique_id=1270753289]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 424.0
+offset_right = 384.0
+offset_bottom = 480.0
+theme_override_colors/font_color = Color(0.08, 0.55, 0.35, 1)
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="DetailOverlay" unique_id=545611185]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 668.0
+offset_right = 438.0
+offset_bottom = 712.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_h")
+text = "โ•   Close"

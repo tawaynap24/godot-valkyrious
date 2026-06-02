@@ -1,0 +1,245 @@
+[gd_scene format=3 uid="uid://c0h3oc12c74gq"]
+
+[ext_resource type="Script" uid="uid://b3hqjffct023y" path="res://scripts/core/MatchmakingScreen.gd" id="1_mm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.18, 0.48, 0.92, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_n"]
+bg_color = Color(0.18, 0.48, 0.92, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_p"]
+bg_color = Color(0.1, 0.35, 0.78, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_h"]
+bg_color = Color(0.28, 0.6, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
+bg_color = Color(0.82, 0.92, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_code_panel"]
+bg_color = Color(0.2, 0.55, 0.95, 0.18)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18, 0.48, 0.92, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+bg_color = Color(1, 1, 1, 1)
+border_width_bottom = 2
+border_color = Color(0.55, 0.75, 0.95, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sec_n"]
+bg_color = Color(0.55, 0.78, 0.98, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sec_p"]
+bg_color = Color(0.18, 0.48, 0.85, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sec_h"]
+bg_color = Color(0.35, 0.65, 0.95, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cancel_n"]
+bg_color = Color(0.55, 0.55, 0.6, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cancel_h"]
+bg_color = Color(0.45, 0.45, 0.5, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="Matchmaking" type="Node2D" unique_id=1737726151]
+script = ExtResource("1_mm")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2012235723]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.93, 0.97, 1, 1)
+
+[node name="TopBar" type="Panel" parent="." unique_id=1436049596]
+visible = false
+offset_right = 576.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="BackButton" type="Button" parent="TopBar" unique_id=1427616458]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 90.0
+offset_bottom = 55.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+text = "← Back"
+
+[node name="TopTitleLabel" type="Label" parent="TopBar" unique_id=1384882983]
+layout_mode = 0
+offset_right = 576.0
+offset_bottom = 66.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "🌐  Play Online"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=1154772120]
+offset_left = 16.0
+offset_top = 82.0
+offset_right = 560.0
+offset_bottom = 148.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_status")
+
+[node name="StatusLabel" type="Label" parent="StatusPanel" unique_id=1421839111]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_right = -8.0
+theme_override_colors/font_color = Color(0.08, 0.22, 0.62, 1)
+theme_override_font_sizes/font_size = 16
+text = "เลือกวิธีการเล่น"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RoomCodePanel" type="Panel" parent="." unique_id=1090924831]
+visible = false
+offset_left = 88.0
+offset_top = 162.0
+offset_right = 488.0
+offset_bottom = 262.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_code_panel")
+
+[node name="RoomCodeLabel" type="Label" parent="RoomCodePanel" unique_id=317681706]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_colors/font_color = Color(0.08, 0.22, 0.62, 1)
+theme_override_font_sizes/font_size = 28
+text = "Room Code
+----"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CreateRoomBtn" type="Button" parent="." unique_id=1752632734]
+offset_left = 68.0
+offset_top = 175.0
+offset_right = 508.0
+offset_bottom = 255.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+text = "✦  Create Room"
+
+[node name="JoinSection" type="Control" parent="." unique_id=1199859350]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 68.0
+offset_top = 280.0
+offset_right = 508.0
+offset_bottom = 360.0
+
+[node name="CodeInput" type="LineEdit" parent="JoinSection" unique_id=994700154]
+layout_mode = 0
+offset_right = 265.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.08, 0.14, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "Room Code…"
+max_length = 6
+
+[node name="JoinRoomBtn" type="Button" parent="JoinSection" unique_id=1423997309]
+layout_mode = 0
+offset_left = 275.0
+offset_right = 440.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_sec_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sec_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sec_h")
+text = "Join Room"
+
+[node name="OrLabel" type="Label" parent="." unique_id=1465640015]
+offset_top = 382.0
+offset_right = 576.0
+offset_bottom = 412.0
+theme_override_colors/font_color = Color(0.45, 0.55, 0.72, 1)
+theme_override_font_sizes/font_size = 14
+text = "— หรือ —"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RandomMatchBtn" type="Button" parent="." unique_id=1544818945]
+offset_left = 68.0
+offset_top = 420.0
+offset_right = 508.0
+offset_bottom = 500.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+text = "🔀  Random Match"
+
+[node name="CancelBtn" type="Button" parent="." unique_id=1796831548]
+visible = false
+offset_left = 168.0
+offset_top = 520.0
+offset_right = 408.0
+offset_bottom = 590.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_cancel_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_cancel_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_cancel_h")
+text = "ยกเลิก"

@@ -1,0 +1,14 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Build binaries
+/build/
+
+# Node.js dependencies
+node_modules/
+**/node_modules/
+
+# Temp files
+*.tmp
+*.TMP

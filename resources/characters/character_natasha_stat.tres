@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterStat" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/CharacterStat.gd" id="1_stat"]
+
+[resource]
+script = ExtResource("1_stat")
+card_id = "natasha"
+char_name = "Natasha"
+level = 1
+cost = 5
+atk = 5
+hp = 6
+has_image = true
+image_path = "res://assets/characters/natasha/character_natasha_cover_card.png"
+bg_color = Color(0.15, 0.15, 0.35, 1)
+delay_place = 0.0
+delay_attack = 0.5
+delay_move = 0.5
+move_countdown = 8.0
+capture_duration = 4.0
+skills = ["stun_lowest_countdown"]
+skill_triggers = ["place"]

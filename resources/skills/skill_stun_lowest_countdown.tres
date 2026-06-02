@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="SkillStunLowestCountdown" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/skills/skill_stun_lowest_countdown.gd" id="1_skill"]
+
+[resource]
+script = ExtResource("1_skill")
+skill_id = "stun_lowest_countdown"

@@ -1,0 +1,402 @@
+[gd_scene format=3 uid="uid://cw8adqsayx7bp"]
+
+[ext_resource type="Script" uid="uid://yhjnd1b07i16" path="res://scripts/battle/CardManager.gd" id="1_r0du0"]
+[ext_resource type="Script" path="res://scripts/core/GameManager.gd" id="7_gamemgr"]
+[ext_resource type="Script" path="res://scripts/core/IntroCountdown.gd" id="8_intro"]
+[ext_resource type="PackedScene" uid="uid://bg117bx07i786" path="res://scenes/battle/CardSlot.tscn" id="2_cm0pq"]
+[ext_resource type="Script" uid="uid://c2k5iajiml83h" path="res://scripts/battle/PlayHand.gd" id="3_fos0i"]
+[ext_resource type="Texture2D" uid="uid://bmn8nw4stbci1" path="res://assets/general/Deck.png" id="4_cm0pq"]
+[ext_resource type="Script" uid="uid://cyjygbm3qmq8j" path="res://scripts/battle/Deck.gd" id="4_fos0i"]
+[ext_resource type="Script" uid="uid://drespjrf2laby" path="res://scripts/battle/InputManager.gd" id="6_3dxm6"]
+[ext_resource type="Script" path="res://scripts/battle/EnemyAI.gd" id="9_enemyai"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fos0i"]
+size = Vector2(99.5, 162.5)
+
+[node name="Main" type="Node2D" unique_id=40747416]
+script = ExtResource("7_gamemgr")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.04, 0.08, 0.22, 1)
+mouse_filter = 2
+
+[node name="EnemyAreaBg" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 120.0
+color = Color(0.06, 0.12, 0.30, 1)
+mouse_filter = 2
+
+[node name="R1RowBg" type="ColorRect" parent="."]
+offset_top = 120.0
+offset_right = 576.0
+offset_bottom = 295.0
+color = Color(0.05, 0.11, 0.28, 1)
+mouse_filter = 2
+
+[node name="R2RowBg" type="ColorRect" parent="."]
+offset_top = 295.0
+offset_right = 576.0
+offset_bottom = 470.0
+color = Color(0.05, 0.10, 0.26, 1)
+mouse_filter = 2
+
+[node name="R3RowBg" type="ColorRect" parent="."]
+offset_top = 470.0
+offset_right = 576.0
+offset_bottom = 645.0
+color = Color(0.05, 0.11, 0.29, 1)
+mouse_filter = 2
+
+[node name="ControlsBarBg" type="ColorRect" parent="."]
+offset_top = 645.0
+offset_right = 576.0
+offset_bottom = 737.0
+color = Color(0.02, 0.05, 0.15, 1)
+mouse_filter = 2
+
+[node name="HandAreaBg" type="ColorRect" parent="."]
+offset_top = 737.0
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.03, 0.07, 0.20, 1)
+mouse_filter = 2
+
+[node name="HandDivider" type="ColorRect" parent="."]
+offset_top = 737.0
+offset_right = 576.0
+offset_bottom = 741.0
+color = Color(0.22, 0.60, 0.98, 1)
+mouse_filter = 2
+
+[node name="EnemyArea" type="Node2D" parent="."]
+
+[node name="EnemyCostBar" type="Node2D" parent="EnemyArea"]
+position = Vector2(8.0, 6.0)
+
+[node name="DiamondLabel" type="Label" parent="EnemyArea/EnemyCostBar"]
+offset_left = 2.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 20.0
+text = "💎"
+theme_override_font_sizes/font_size = 14
+
+[node name="CostValue" type="Label" parent="EnemyArea/EnemyCostBar"]
+offset_left = 2.0
+offset_top = 20.0
+offset_right = 30.0
+offset_bottom = 40.0
+text = "7"
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+
+[node name="BarBg" type="ColorRect" parent="EnemyArea/EnemyCostBar"]
+offset_left = 6.0
+offset_top = 43.0
+offset_right = 22.0
+offset_bottom = 113.0
+color = Color(0.06, 0.14, 0.34, 1)
+mouse_filter = 2
+
+[node name="BarFill" type="ColorRect" parent="EnemyArea/EnemyCostBar"]
+offset_left = 6.0
+offset_top = 63.0
+offset_right = 22.0
+offset_bottom = 113.0
+color = Color(0.95, 0.28, 0.28, 1)
+mouse_filter = 2
+
+[node name="EnemyCard1" type="ColorRect" parent="EnemyArea"]
+offset_left = 103.0
+offset_top = 4.0
+offset_right = 188.0
+offset_bottom = 90.0
+color = Color(0.08, 0.16, 0.40, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EnemyArea/EnemyCard1"]
+offset_left = 0.0
+offset_top = 28.0
+offset_right = 85.0
+offset_bottom = 48.0
+text = "???"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.82, 1.00, 1)
+
+[node name="EnemyCard2" type="ColorRect" parent="EnemyArea"]
+offset_left = 198.0
+offset_top = 4.0
+offset_right = 283.0
+offset_bottom = 90.0
+color = Color(0.08, 0.16, 0.40, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EnemyArea/EnemyCard2"]
+offset_left = 0.0
+offset_top = 28.0
+offset_right = 85.0
+offset_bottom = 48.0
+text = "???"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.82, 1.00, 1)
+
+[node name="EnemyCard3" type="ColorRect" parent="EnemyArea"]
+offset_left = 293.0
+offset_top = 4.0
+offset_right = 378.0
+offset_bottom = 90.0
+color = Color(0.08, 0.16, 0.40, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EnemyArea/EnemyCard3"]
+offset_left = 0.0
+offset_top = 28.0
+offset_right = 85.0
+offset_bottom = 48.0
+text = "???"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.82, 1.00, 1)
+
+[node name="EnemyCard4" type="ColorRect" parent="EnemyArea"]
+offset_left = 388.0
+offset_top = 4.0
+offset_right = 473.0
+offset_bottom = 90.0
+color = Color(0.08, 0.16, 0.40, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="EnemyArea/EnemyCard4"]
+offset_left = 0.0
+offset_top = 28.0
+offset_right = 85.0
+offset_bottom = 48.0
+text = "???"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.82, 1.00, 1)
+
+[node name="EnemyNameLabel" type="Label" parent="EnemyArea"]
+offset_left = 0.0
+offset_top = 92.0
+offset_right = 576.0
+offset_bottom = 118.0
+text = "Enemy"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.98, 0.50, 0.50, 1.0)
+
+[node name="EnemyIconRect" type="TextureRect" parent="EnemyArea"]
+offset_left = 246.0
+offset_top = 84.0
+offset_right = 288.0
+offset_bottom = 126.0
+visible = false
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="CardManager" type="Node2D" parent="." unique_id=683634890]
+script = ExtResource("1_r0du0")
+
+[node name="BattleGrid" type="Node2D" parent="."]
+
+[node name="Slot_R1C1" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(96, 207)
+can_enemy_deploy = true
+
+[node name="Slot_R1C2" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(288, 207)
+can_enemy_deploy = true
+
+[node name="Slot_R1C3" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(480, 207)
+can_enemy_deploy = true
+
+[node name="Slot_R2C1" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(96, 382)
+
+[node name="Slot_R2C2" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(288, 382)
+
+[node name="Slot_R2C3" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(480, 382)
+
+[node name="Slot_R3C1" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(96, 557)
+can_owner_deploy = true
+
+[node name="Slot_R3C2" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(288, 557)
+can_owner_deploy = true
+
+[node name="Slot_R3C3" parent="BattleGrid" instance=ExtResource("2_cm0pq")]
+position = Vector2(480, 557)
+can_owner_deploy = true
+
+[node name="ControlsBar" type="Node2D" parent="."]
+position = Vector2(0.0, 645.0)
+
+[node name="TimerLabel" type="Label" parent="ControlsBar"]
+offset_left = 15.0
+offset_top = 16.0
+offset_right = 165.0
+offset_bottom = 76.0
+text = "03:00"
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="OwnerNameLabel" type="Label" parent="ControlsBar"]
+offset_left = 0.0
+offset_top = 2.0
+offset_right = 576.0
+offset_bottom = 30.0
+text = "Owner"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="OwnerIconRect" type="TextureRect" parent="ControlsBar"]
+offset_left = 246.0
+offset_top = -6.0
+offset_right = 288.0
+offset_bottom = 36.0
+visible = false
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="OwnerCostBar" type="Node2D" parent="."]
+position = Vector2(8.0, 747.0)
+
+[node name="DiamondLabel" type="Label" parent="OwnerCostBar"]
+offset_left = 2.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 20.0
+text = "💎"
+theme_override_font_sizes/font_size = 14
+
+[node name="SpeedLabel" type="Label" parent="OwnerCostBar"]
+offset_left = -2.0
+offset_top = -18.0
+offset_right = 36.0
+offset_bottom = -2.0
+text = "x1.5"
+horizontal_alignment = 1
+visible = false
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(1.0, 0.85, 0.2, 1.0)
+
+[node name="CostValue" type="Label" parent="OwnerCostBar"]
+offset_left = 2.0
+offset_top = 20.0
+offset_right = 30.0
+offset_bottom = 40.0
+text = "7"
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+
+[node name="BarBg" type="ColorRect" parent="OwnerCostBar"]
+offset_left = 6.0
+offset_top = 43.0
+offset_right = 22.0
+offset_bottom = 113.0
+color = Color(0.06, 0.14, 0.34, 1)
+mouse_filter = 2
+
+[node name="BarFill" type="ColorRect" parent="OwnerCostBar"]
+offset_left = 6.0
+offset_top = 63.0
+offset_right = 22.0
+offset_bottom = 113.0
+color = Color(0.18, 0.82, 1.00, 1)
+mouse_filter = 2
+
+[node name="PlayerHand" type="Node2D" parent="." unique_id=1154618180]
+script = ExtResource("3_fos0i")
+
+[node name="Deck" type="Node2D" parent="." unique_id=478107532]
+position = Vector2(-500.0, -500.0)
+script = ExtResource("4_fos0i")
+
+[node name="Sprite2D" type="Sprite2D" parent="Deck" unique_id=760702967]
+visible = false
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("4_cm0pq")
+
+[node name="Area2D" type="Area2D" parent="Deck" unique_id=234019904]
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Deck/Area2D" unique_id=1737096812]
+disabled = true
+shape = SubResource("RectangleShape2D_fos0i")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Deck" unique_id=742779266]
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+text = "0"
+
+[node name="InputManager" type="Node2D" parent="." unique_id=282958955]
+script = ExtResource("6_3dxm6")
+
+[node name="EnemyAI" type="Node2D" parent="."]
+script = ExtResource("9_enemyai")
+
+[node name="IntroOverlay" type="Node2D" parent="."]
+script = ExtResource("8_intro")
+z_index = 10
+
+[node name="OverlayBg" type="ColorRect" parent="IntroOverlay"]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.05, 0.12, 0.40, 0.55)
+mouse_filter = 2
+
+[node name="CountdownLabel" type="Label" parent="IntroOverlay"]
+offset_left = 0.0
+offset_top = 412.0
+offset_right = 576.0
+offset_bottom = 612.0
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 96
+theme_override_colors/font_color = Color(0.43, 0.82, 1.00, 1.0)
+
+[node name="GameOverOverlay" type="Node2D" parent="."]
+visible = false
+z_index = 20
+
+[node name="OverlayBg" type="ColorRect" parent="GameOverOverlay"]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.04, 0.10, 0.32, 0.82)
+
+[node name="ResultLabel" type="Label" parent="GameOverOverlay"]
+offset_left = 0.0
+offset_top = 380.0
+offset_right = 576.0
+offset_bottom = 644.0
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 96
+
+[node name="RestartButton" type="Button" parent="GameOverOverlay"]
+offset_left = 163.0
+offset_top = 680.0
+offset_right = 413.0
+offset_bottom = 748.0
+text = "กลับ Lobby"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)

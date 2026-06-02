@@ -1,0 +1,534 @@
+[gd_scene format=3 uid="uid://blobby0000001"]
+
+[ext_resource type="Script" path="res://scripts/core/LobbyScreen.gd" id="1_lobby"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_battle_n"]
+bg_color = Color(0.18, 0.48, 0.92, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_battle_h"]
+bg_color = Color(0.28, 0.60, 1.00, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_battle_p"]
+bg_color = Color(0.10, 0.35, 0.78, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_n"]
+bg_color = Color(0.55, 0.78, 0.98, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_h"]
+bg_color = Color(0.35, 0.65, 0.95, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_p"]
+bg_color = Color(0.18, 0.48, 0.85, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gacha_n"]
+bg_color = Color(0.52, 0.22, 0.88, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gacha_h"]
+bg_color = Color(0.68, 0.38, 1.00, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_online_n"]
+bg_color = Color(0.10, 0.62, 0.42, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_online_h"]
+bg_color = Color(0.15, 0.78, 0.52, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_online_p"]
+bg_color = Color(0.06, 0.45, 0.30, 1.0)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coll_n"]
+bg_color = Color(0.32, 0.58, 0.24, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coll_h"]
+bg_color = Color(0.42, 0.72, 0.30, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Lobby" type="Node2D"]
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.93, 0.97, 1.00, 1)
+
+[node name="TopBg" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 88.0
+color = Color(0.18, 0.48, 0.92, 1)
+
+[node name="PlayerNameLabel" type="Label" parent="."]
+offset_left = 82.0
+offset_top = 8.0
+offset_right = 488.0
+offset_bottom = 44.0
+text = "Player"
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="RecordLabel" type="Label" parent="."]
+offset_left = 82.0
+offset_top = 46.0
+offset_right = 488.0
+offset_bottom = 72.0
+text = "W:0  D:0  L:0"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.72, 0.92, 1.0, 1.0)
+
+[node name="GoldLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 50.0
+offset_right = 200.0
+offset_bottom = 82.0
+text = "💰 0"
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 0.95, 0.85, 1.0)
+
+[node name="CollectionBtn" type="Button" parent="."]
+offset_left = 492.0
+offset_top = 8.0
+offset_right = 568.0
+offset_bottom = 80.0
+text = "📖"
+theme_override_styles/normal = SubResource("StyleBoxFlat_coll_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_coll_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_coll_n")
+theme_override_font_sizes/font_size = 22
+
+[node name="GemsLabel" type="Label" parent="."]
+offset_left = 210.0
+offset_top = 50.0
+offset_right = 400.0
+offset_bottom = 82.0
+text = "💎 0"
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.72, 0.92, 1.0, 1.0)
+
+[node name="TitleLabel" type="Label" parent="."]
+offset_left = 0.0
+offset_top = 100.0
+offset_right = 576.0
+offset_bottom = 155.0
+text = "VALKYRIOUS REVIVE"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.08, 0.22, 0.62, 1.0)
+
+[node name="ArtworkBg" type="ColorRect" parent="."]
+offset_left = 108.0
+offset_top = 165.0
+offset_right = 468.0
+offset_bottom = 540.0
+color = Color(0.75, 0.90, 1.00, 1)
+
+[node name="ArtworkLabel" type="Label" parent="."]
+offset_left = 108.0
+offset_top = 165.0
+offset_right = 468.0
+offset_bottom = 540.0
+text = "Character Art\n[Placeholder]"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.38, 0.60, 0.82, 1.0)
+
+[node name="BattleAIButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 558.0
+offset_right = 508.0
+offset_bottom = 638.0
+text = "⚔  Battle vs AI"
+theme_override_styles/normal = SubResource("StyleBoxFlat_battle_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_battle_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_battle_p")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="BattleOnlineButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 649.0
+offset_right = 508.0
+offset_bottom = 729.0
+text = "[ Online ]  Play Online"
+theme_override_styles/normal = SubResource("StyleBoxFlat_online_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_online_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_online_p")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="DeckBuilderButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 742.0
+offset_right = 508.0
+offset_bottom = 802.0
+text = "📖  Deck Builder"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="NoDeckLabel" type="Label" parent="."]
+visible = false
+offset_left = 68.0
+offset_top = 730.0
+offset_right = 508.0
+offset_bottom = 743.0
+text = "Build an active deck first to play!"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.95, 0.35, 0.20, 1.0)
+
+[node name="CollectionButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 812.0
+offset_right = 508.0
+offset_bottom = 872.0
+text = "\ud83c\udccf  Collection"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="GachaButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 882.0
+offset_right = 508.0
+offset_bottom = 942.0
+text = "\u2728  Gacha"
+theme_override_styles/normal = SubResource("StyleBoxFlat_gacha_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gacha_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_gacha_n")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="HistoryButton" type="Button" parent="."]
+offset_left = 68.0
+offset_top = 952.0
+offset_right = 508.0
+offset_bottom = 1012.0
+text = "📊  Battle History"
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_p")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="ComingSoonLabel" type="Label" parent="."]
+visible = false
+z_index = 10
+offset_left = 68.0
+offset_top = 460.0
+offset_right = 508.0
+offset_bottom = 540.0
+text = "Coming Soon!"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.18, 0.48, 0.92, 1.0)
+
+; ── Profile button (top-left of TopBg) ───────────────────────────────────────
+
+[node name="ProfileBtn" type="Button" parent="."]
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 76.0
+offset_bottom = 82.0
+flat = true
+
+[node name="ProfileIconRect" type="TextureRect" parent="ProfileBtn"]
+offset_right = 68.0
+offset_bottom = 76.0
+visible = false
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ProfileIconPlaceholder" type="ColorRect" parent="ProfileBtn"]
+offset_right = 68.0
+offset_bottom = 76.0
+color = Color(0.22, 0.42, 0.82, 1.0)
+
+[node name="ProfileInitialLabel" type="Label" parent="ProfileBtn"]
+offset_right = 68.0
+offset_bottom = 76.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+; ── Profile Editor Overlay ────────────────────────────────────────────────────
+
+[node name="ProfileEditorPanel" type="Control" parent="."]
+visible = false
+z_index = 10
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 576.0
+offset_bottom = 1024.0
+
+[node name="EditorDim" type="ColorRect" parent="ProfileEditorPanel"]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.02, 0.05, 0.15, 0.85)
+
+[node name="EditorCard" type="ColorRect" parent="ProfileEditorPanel"]
+offset_left = 48.0
+offset_top = 200.0
+offset_right = 528.0
+offset_bottom = 640.0
+color = Color(0.10, 0.18, 0.45, 1.0)
+
+[node name="EditorTitle" type="Label" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 0.0
+offset_top = 16.0
+offset_right = 480.0
+offset_bottom = 52.0
+text = "ตั้งชื่อผู้เล่น"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.85, 0.93, 1.0, 1.0)
+
+[node name="EditorIconRect" type="TextureRect" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 190.0
+offset_top = 62.0
+offset_right = 290.0
+offset_bottom = 162.0
+visible = false
+expand_mode = 1
+stretch_mode = 6
+
+[node name="EditorIconPlaceholder" type="ColorRect" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 190.0
+offset_top = 62.0
+offset_right = 290.0
+offset_bottom = 162.0
+color = Color(0.22, 0.38, 0.72, 1.0)
+
+[node name="EditorIconInitial" type="Label" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 190.0
+offset_top = 62.0
+offset_right = 290.0
+offset_bottom = 162.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="ChangeIconBtn" type="Button" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 130.0
+offset_top = 172.0
+offset_right = 350.0
+offset_bottom = 208.0
+text = "เลือก Icon"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.55, 0.85, 1.0, 1.0)
+
+[node name="NameEditLabel" type="Label" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 16.0
+offset_top = 220.0
+offset_right = 464.0
+offset_bottom = 244.0
+text = "ชื่อผู้เล่น"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.72, 0.85, 1.0, 1.0)
+
+[node name="NameEdit" type="LineEdit" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 16.0
+offset_top = 250.0
+offset_right = 464.0
+offset_bottom = 296.0
+placeholder_text = "กรอกชื่อ (2-16 ตัวอักษร)"
+max_length = 16
+theme_override_font_sizes/font_size = 16
+
+[node name="NameFeedbackLabel" type="Label" parent="ProfileEditorPanel/EditorCard"]
+visible = false
+offset_left = 16.0
+offset_top = 302.0
+offset_right = 464.0
+offset_bottom = 324.0
+text = "ชื่อต้องมีอย่างน้อย 2 ตัวอักษร"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(1.0, 0.35, 0.25, 1.0)
+
+[node name="SaveProfileBtn" type="Button" parent="ProfileEditorPanel/EditorCard"]
+offset_left = 16.0
+offset_top = 336.0
+offset_right = 232.0
+offset_bottom = 384.0
+text = "บันทึก"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+[node name="CancelProfileBtn" type="Button" parent="ProfileEditorPanel/EditorCard"]
+visible = false
+offset_left = 248.0
+offset_top = 336.0
+offset_right = 464.0
+offset_bottom = 384.0
+text = "ยกเลิก"
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+
+; ── Icon Picker Overlay ───────────────────────────────────────────────────────
+
+[node name="IconPickerPanel" type="Control" parent="."]
+visible = false
+z_index = 11
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 576.0
+offset_bottom = 1024.0
+
+[node name="PickerBg" type="ColorRect" parent="IconPickerPanel"]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.04, 0.08, 0.22, 0.97)
+
+[node name="PickerHeader" type="ColorRect" parent="IconPickerPanel"]
+offset_right = 576.0
+offset_bottom = 64.0
+color = Color(0.08, 0.16, 0.38, 1.0)
+
+[node name="PickerTitleLabel" type="Label" parent="IconPickerPanel/PickerHeader"]
+offset_left = 60.0
+offset_top = 0.0
+offset_right = 516.0
+offset_bottom = 64.0
+text = "เลือก Icon"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.93, 1.0, 1.0)
+
+[node name="PickerBackBtn" type="Button" parent="IconPickerPanel/PickerHeader"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 58.0
+offset_bottom = 56.0
+text = "←"
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.7, 0.85, 1.0, 1.0)
+flat = true
+
+[node name="PickerScroll" type="ScrollContainer" parent="IconPickerPanel"]
+offset_left = 4.0
+offset_top = 68.0
+offset_right = 572.0
+offset_bottom = 1020.0
+
+[node name="PickerGrid" type="GridContainer" parent="IconPickerPanel/PickerScroll"]
+columns = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+; ── History Panel Overlay ───────────────────────────────────────────────────────────────
+
+[node name="HistoryPanel" type="Control" parent="."]
+visible = false
+z_index = 12
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 576.0
+offset_bottom = 1024.0
+
+[node name="HistoryBg" type="ColorRect" parent="HistoryPanel"]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.04, 0.08, 0.22, 0.97)
+
+[node name="HistoryHeader" type="ColorRect" parent="HistoryPanel"]
+offset_right = 576.0
+offset_bottom = 64.0
+color = Color(0.08, 0.18, 0.42, 1.0)
+
+[node name="HistoryTitleLabel" type="Label" parent="HistoryPanel/HistoryHeader"]
+offset_left = 56.0
+offset_top = 0.0
+offset_right = 520.0
+offset_bottom = 64.0
+text = "Battle History"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.85, 0.93, 1.0, 1.0)
+
+[node name="HistoryCloseBtn" type="Button" parent="HistoryPanel/HistoryHeader"]
+offset_left = 524.0
+offset_top = 8.0
+offset_right = 568.0
+offset_bottom = 56.0
+text = "✕"
+flat = true
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8, 0.85, 1.0, 1.0)
+
+[node name="HistoryScroll" type="ScrollContainer" parent="HistoryPanel"]
+offset_left = 0.0
+offset_top = 64.0
+offset_right = 576.0
+offset_bottom = 1024.0
+
+[node name="HistoryList" type="VBoxContainer" parent="HistoryPanel/HistoryScroll"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 2

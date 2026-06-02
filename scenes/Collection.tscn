@@ -1,0 +1,205 @@
+[gd_scene format=3 uid="uid://bf1sxnqpsjxqy"]
+
+[ext_resource type="Script" path="res://scripts/core/CollectionScreen.gd" id="1_coll"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.18, 0.48, 0.92, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_n"]
+bg_color = Color(0.10, 0.35, 0.78, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_h"]
+bg_color = Color(0.08, 0.25, 0.60, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_collection_bg"]
+bg_color = Color(0.88, 0.94, 1.00, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail_panel"]
+bg_color = Color(0.96, 0.98, 1.00, 1.0)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+border_width_top = 2
+border_width_left = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.75, 0.95, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_n"]
+bg_color = Color(0.88, 0.16, 0.16, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_h"]
+bg_color = Color(0.65, 0.10, 0.10, 1.0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Collection" type="Node2D"]
+script = ExtResource("1_coll")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 1024.0
+color = Color(0.93, 0.97, 1.00, 1.0)
+
+[node name="TopBar" type="Panel" parent="."]
+visible = false
+offset_right = 576.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="BackButton" type="Button" parent="TopBar"]
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 88.0
+offset_bottom = 58.0
+text = "← Back"
+theme_override_styles/normal = SubResource("StyleBoxFlat_back_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back_h")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="TitleLabel" type="Label" parent="TopBar"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 576.0
+offset_bottom = 72.0
+text = "Collection"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="CoinsLabel" type="Label" parent="TopBar"]
+offset_left = 380.0
+offset_top = 8.0
+offset_right = 568.0
+offset_bottom = 64.0
+horizontal_alignment = 2
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(1.0, 0.92, 0.18, 1.0)
+
+[node name="FilterBar" type="HBoxContainer" parent="."]
+offset_top = 72.0
+offset_right = 576.0
+offset_bottom = 120.0
+
+[node name="CollectionScroll" type="ScrollContainer" parent="."]
+offset_top = 120.0
+offset_right = 576.0
+offset_bottom = 798.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_collection_bg")
+
+[node name="CollectionGrid" type="GridContainer" parent="CollectionScroll"]
+custom_minimum_size = Vector2(576, 0)
+size_flags_horizontal = 3
+columns = 4
+theme_override_constants/h_separation = 3
+theme_override_constants/v_separation = 3
+
+[node name="DetailOverlay" type="Control" parent="."]
+visible = false
+offset_right = 576.0
+offset_bottom = 922.0
+
+[node name="Dim" type="ColorRect" parent="DetailOverlay"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.08, 0.28, 0.78)
+mouse_filter = 0
+
+[node name="CardPanel" type="Panel" parent="DetailOverlay"]
+offset_left = 118.0
+offset_top = 192.0
+offset_right = 458.0
+offset_bottom = 721.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_detail_panel")
+
+[node name="ArtworkRect" type="TextureRect" parent="DetailOverlay/CardPanel"]
+offset_right = 340.0
+offset_bottom = 180.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="DetailOverlay/CardPanel"]
+offset_top = 185.0
+offset_right = 340.0
+offset_bottom = 228.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.08, 0.14, 0.38, 1.0)
+
+[node name="RarityLabel" type="Label" parent="DetailOverlay/CardPanel"]
+offset_top = 231.0
+offset_right = 340.0
+offset_bottom = 263.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+
+[node name="StatsLabel" type="Label" parent="DetailOverlay/CardPanel"]
+offset_top = 267.0
+offset_right = 340.0
+offset_bottom = 301.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.12, 0.22, 0.50, 1.0)
+
+[node name="DescLabel" type="Label" parent="DetailOverlay/CardPanel"]
+offset_left = 14.0
+offset_top = 307.0
+offset_right = 326.0
+offset_bottom = 400.0
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.28, 0.40, 0.58, 1.0)
+
+[node name="SkillsLabel" type="Label" parent="DetailOverlay/CardPanel"]
+offset_left = 14.0
+offset_top = 405.0
+offset_right = 326.0
+offset_bottom = 462.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.08, 0.58, 0.35, 1.0)
+
+[node name="UpgradeBtn" type="Button" parent="DetailOverlay/CardPanel"]
+offset_left = 14.0
+offset_top = 469.0
+offset_right = 326.0
+offset_bottom = 509.0
+text = "\u2B06  Upgrade"
+
+[node name="CloseBtn" type="Button" parent="DetailOverlay"]
+offset_left = 188.0
+offset_top = 729.0
+offset_right = 388.0
+offset_bottom = 773.0
+text = "✕   Close"
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_h")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1.0, 0.85, 0.85, 1.0)

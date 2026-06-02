@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://b3records1"]
+
+[ext_resource type="Script" path="res://scripts/core/RecordsScreen.gd" id="1_records"]
+
+[node name="Records" type="Node2D"]
+script = ExtResource("1_records")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 576.0
+offset_bottom = 922.0
+color = Color(0.07, 0.05, 0.16, 1)
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="."]
+offset_left = 0.0
+offset_top = 20.0
+offset_right = 576.0
+offset_bottom = 64.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "🏆 บันทึก"
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(1, 0.82, 0.2, 1)
+mouse_filter = 2
+
+[node name="ComingSoonLabel" type="Label" parent="."]
+offset_left = 0.0
+offset_top = 420.0
+offset_right = 576.0
+offset_bottom = 460.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "Coming Soon"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.6, 0.55, 0.8, 1)
+mouse_filter = 2

@@ -1,0 +1,230 @@
+[gd_scene format=3 uid="uid://gacha00001"]
+
+[ext_resource type="Script" uid="uid://ddjyeew0xajob" path="res://scripts/core/GachaScreen.gd" id="1_gacha"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.18, 0.08, 0.4, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_n"]
+bg_color = Color(0.3, 0.14, 0.6, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_back_h"]
+bg_color = Color(0.2, 0.08, 0.42, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x1_n"]
+bg_color = Color(0.52, 0.22, 0.88, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x1_h"]
+bg_color = Color(0.68, 0.38, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x1_d"]
+bg_color = Color(0.45, 0.4, 0.52, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x10_n"]
+bg_color = Color(0.72, 0.5, 0.05, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x10_h"]
+bg_color = Color(0.88, 0.66, 0.08, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x10_d"]
+bg_color = Color(0.5, 0.46, 0.38, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result"]
+bg_color = Color(0.1, 0.05, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.35, 0.95, 0.7)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_n"]
+bg_color = Color(0.35, 0.48, 0.82, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_h"]
+bg_color = Color(0.22, 0.35, 0.68, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Gacha" type="Node2D" unique_id=1755861944]
+script = ExtResource("1_gacha")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2117399838]
+offset_left = 1.0
+offset_top = 3.0
+offset_right = 577.0
+offset_bottom = 927.0
+mouse_filter = 2
+color = Color(0.08, 0.04, 0.2, 1)
+
+[node name="TopBar" type="Panel" parent="." unique_id=1580304878]
+visible = false
+offset_right = 576.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="BackButton" type="Button" parent="TopBar" unique_id=2063407175]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 88.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_back_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_back_h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_back_h")
+text = "← Back"
+
+[node name="TitleLabel" type="Label" parent="TopBar" unique_id=1199166709]
+layout_mode = 0
+offset_right = 576.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(1, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "Gacha"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CoinsLabel" type="Label" parent="TopBar" unique_id=1960091320]
+layout_mode = 0
+offset_left = 370.0
+offset_top = 8.0
+offset_right = 566.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(1, 0.92, 0.18, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PullX1Btn" type="Button" parent="." unique_id=1655525100]
+offset_left = 30.0
+offset_top = 684.0
+offset_right = 288.0
+offset_bottom = 774.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_x1_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_x1_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x1_h")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_x1_d")
+text = "x1 Pull  —  100 coins"
+
+[node name="PullX10Btn" type="Button" parent="." unique_id=1623972727]
+offset_left = 305.0
+offset_top = 685.0
+offset_right = 547.0
+offset_bottom = 775.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_x10_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_x10_n")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x10_h")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_x10_d")
+text = "x10 Pull  —  1,000 coins"
+
+[node name="InsufficientLabel" type="Label" parent="." unique_id=1699533113]
+visible = false
+offset_left = 30.0
+offset_top = 756.0
+offset_right = 546.0
+offset_bottom = 784.0
+theme_override_colors/font_color = Color(0.95, 0.28, 0.28, 1)
+theme_override_font_sizes/font_size = 15
+text = "Not enough coins!"
+horizontal_alignment = 1
+
+[node name="ResultOverlay" type="Control" parent="." unique_id=1707498560]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 576.0
+offset_bottom = 922.0
+
+[node name="Dim" type="ColorRect" parent="ResultOverlay" unique_id=556245877]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0.01, 0.01, 0.1, 0.93)
+
+[node name="ResultPanel" type="Panel" parent="ResultOverlay" unique_id=686599276]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 60.0
+offset_right = 562.0
+offset_bottom = 798.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_result")
+
+[node name="ResultTitle" type="Label" parent="ResultOverlay/ResultPanel" unique_id=309719426]
+layout_mode = 0
+offset_top = 10.0
+offset_right = 548.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(1, 0.88, 0.22, 1)
+theme_override_font_sizes/font_size = 20
+text = "Pull Result"
+horizontal_alignment = 1
+
+[node name="CardsContainer" type="Control" parent="ResultOverlay/ResultPanel" unique_id=2082655049]
+anchors_preset = 0
+offset_top = 56.0
+offset_right = 548.0
+offset_bottom = 660.0
+
+[node name="CloseBtn" type="Button" parent="ResultOverlay/ResultPanel" unique_id=1565442644]
+layout_mode = 0
+offset_left = 124.0
+offset_top = 672.0
+offset_right = 424.0
+offset_bottom = 718.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_h")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_h")
+text = "Close"
