@@ -201,9 +201,10 @@ func upgrade_character(card_id: String) -> bool:
 	var cur: int = get_character_level(card_id)
 	if cur >= UPGRADE_MAX_LEVEL:
 		return false
-	if data.coins < UPGRADE_COST:
+	var cost = 10 * (cur + 1)
+	if data.coins < cost:
 		return false
-	data.coins -= UPGRADE_COST
+	data.coins -= cost
 	data.character_levels[card_id] = cur + 1
 	_save()
 	return true

@@ -56,6 +56,7 @@ const HOLD_DRAG_THRESHOLD: float = 10.0
 # highlights without destroying and recreating all nodes
 var _collection_btn_map: Dictionary = {}
 var _sorted_owned_cards: Array[String] = []
+var _detail_card_id: String = ""
 
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
@@ -88,6 +89,7 @@ func _connect_signals() -> void:
 	$ActionBar/CancelBtn.pressed.connect(_on_cancel_edit)
 	$HoldTimer.timeout.connect(_on_hold_complete)
 	$DetailOverlay/CloseBtn.pressed.connect(_on_close_detail)
+	$DetailOverlay/CardPanel/UpgradeBtn.pressed.connect(_on_upgrade_pressed)
 	# Tap outside detail overlay (on Dim) to close
 	$DetailOverlay/Dim.gui_input.connect(_on_dim_input)
 	# Deck slot tap-to-remove
@@ -363,7 +365,8 @@ func _on_deck_slot_input(event: InputEvent, slot_index: int) -> void:
 
 func _show_detail(card_id: String) -> void:
 	UIShell.hide_shell()
-	var data: Dictionary = CardDatabase.CARDS.get(card_id, {})
+	_detail_card_id = card_id
+	var data: Dictionary = CardDatabase.get_effective_dict(card_id)
 	if data.is_empty():
 		return
 
@@ -405,7 +408,98 @@ func _show_detail(card_id: String) -> void:
 		skills_text = "  •  ".join(parts)
 	$DetailOverlay/CardPanel/SkillsLabel.text = "Skills:  " + skills_text
 
+	# Refresh upgrade table (Level 5 down to 2, bottom to top)
+	var table: VBoxContainer = $DetailOverlay/CardPanel/UpgradeTable
+	for child in table.get_children():
+		child.queue_free()
+		
+	var current_level: int = SaveManager.get_character_level(card_id)
+	
+	# Render 4 rows: from lvl 5 (top) down to 2 (bottom)
+	for lvl in range(5, 1, -1):
+		var row := PanelContainer.new()
+		row.custom_minimum_size = Vector2(400, 42)
+		
+		var sbf_row := StyleBoxFlat.new()
+		sbf_row.set_corner_radius_all(4)
+		if lvl <= current_level:
+			sbf_row.bg_color = Color(0.1, 0.45, 0.25, 0.18) # Unlocked (green)
+			sbf_row.border_color = Color(0.1, 0.45, 0.25, 0.6)
+			sbf_row.border_width_bottom = 1
+		elif lvl == current_level + 1:
+			sbf_row.bg_color = Color(0.72, 0.5, 0.05, 0.18) # Next (yellow/orange)
+			sbf_row.border_color = Color(0.72, 0.5, 0.05, 0.6)
+			sbf_row.border_width_bottom = 1
+		else:
+			sbf_row.bg_color = Color(0.25, 0.25, 0.25, 0.1) # Locked (grey)
+			sbf_row.border_color = Color(0.25, 0.25, 0.25, 0.25)
+			sbf_row.border_width_bottom = 1
+		row.add_theme_stylebox_override("panel", sbf_row)
+		
+		var margin := MarginContainer.new()
+		margin.add_theme_constant_override("margin_left", 12)
+		margin.add_theme_constant_override("margin_right", 12)
+		row.add_child(margin)
+		
+		var hbox := HBoxContainer.new()
+		margin.add_child(hbox)
+		
+		var lvl_lbl := Label.new()
+		lvl_lbl.text = "Level " + str(lvl)
+		lvl_lbl.add_theme_font_size_override("font_size", 12)
+		lvl_lbl.add_theme_color_override("font_color", Color(0.08, 0.14, 0.35, 1))
+		hbox.add_child(lvl_lbl)
+		
+		var spacer := Control.new()
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hbox.add_child(spacer)
+		
+		var status_lbl := Label.new()
+		if lvl <= current_level:
+			status_lbl.text = "✓ Unlocked"
+			status_lbl.add_theme_color_override("font_color", Color(0.1, 0.62, 0.25, 1))
+		elif lvl == current_level + 1:
+			status_lbl.text = "Next (Cost: " + str(10 * lvl) + " coins)"
+			status_lbl.add_theme_color_override("font_color", Color(0.72, 0.5, 0.05, 1))
+		else:
+			status_lbl.text = "🔒 Locked"
+			status_lbl.add_theme_color_override("font_color", Color(0.45, 0.55, 0.70, 1))
+		status_lbl.add_theme_font_size_override("font_size", 12)
+		hbox.add_child(status_lbl)
+		
+		table.add_child(row)
+
+	# Upgrade Button state
+	var up_btn: Button = $DetailOverlay/CardPanel/UpgradeBtn
+	if current_level >= SaveManager.UPGRADE_MAX_LEVEL:
+		up_btn.disabled = true
+		up_btn.text = "Max Level"
+	else:
+		var cost = 10 * (current_level + 1)
+		up_btn.disabled = SaveManager.get_coins() < cost
+		up_btn.text = "Upgrade (Cost: " + str(cost) + ")"
+		
+	var sbf_up := StyleBoxFlat.new()
+	sbf_up.set_corner_radius_all(6)
+	if up_btn.disabled:
+		sbf_up.bg_color = Color(0.45, 0.55, 0.70, 1.0)
+	else:
+		sbf_up.bg_color = Color(0.10, 0.62, 0.25, 1.0)
+	up_btn.add_theme_stylebox_override("normal", sbf_up)
+	up_btn.add_theme_stylebox_override("hover", sbf_up)
+	up_btn.add_theme_stylebox_override("pressed", sbf_up)
+	up_btn.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+
 	$DetailOverlay.visible = true
+
+func _on_upgrade_pressed() -> void:
+	if _detail_card_id == "":
+		return
+	if SaveManager.upgrade_character(_detail_card_id):
+		_show_detail(_detail_card_id)
+		UIShell.refresh_coins()
+		_build_collection_grid()
+		_refresh_deck_ui()
 
 func _on_close_detail() -> void:
 	$DetailOverlay.visible = false
