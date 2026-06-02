@@ -56,6 +56,7 @@ const HOLD_DRAG_THRESHOLD: float = 10.0
 # highlights without destroying and recreating all nodes
 var _collection_btn_map: Dictionary = {}
 var _sorted_owned_cards: Array[String] = []
+var _sorted_owned_indices: Array[int] = []
 var _detail_card_index: int = -1
 
 
@@ -66,9 +67,7 @@ func _ready() -> void:
 	_current_index = SaveManager.get_active_index()
 	
 	# Populate _sorted_owned_cards first, since _load_working_deck requires it
-	var owned: Array[String] = SaveManager.get_owned_cards()
-	_sorted_owned_cards = owned.duplicate()
-	_sorted_owned_cards.sort()
+	_update_sorted_owned_cards()
 	
 	_load_working_deck()
 	_build_collection_grid()
@@ -114,16 +113,24 @@ func _load_working_deck() -> void:
 	var saved_deck = SaveManager.get_deck(_current_index)
 	_working_deck.clear()
 	
-	var used_indices := {}
-	for card_id in saved_deck:
-		var found_idx := -1
-		for idx in range(_sorted_owned_cards.size()):
-			if _sorted_owned_cards[idx] == card_id and not used_indices.has(idx):
-				found_idx = idx
-				break
-		if found_idx != -1:
-			_working_deck.append(str(found_idx))
-			used_indices[found_idx] = true
+	for instance_idx_str in saved_deck:
+		var instance_idx: int = -1
+		if instance_idx_str.is_valid_int():
+			instance_idx = int(instance_idx_str)
+		else:
+			# Old format (card ID fallback): find first matching copy that is not in _working_deck
+			var card_id = instance_idx_str
+			for i in range(_sorted_owned_indices.size()):
+				var orig_idx = _sorted_owned_indices[i]
+				var sorted_card_id = _sorted_owned_cards[i]
+				if sorted_card_id == card_id and not _working_deck.has(str(i)):
+					instance_idx = orig_idx
+					break
+		
+		if instance_idx != -1:
+			var found_sorted_idx = _sorted_owned_indices.find(instance_idx)
+			if found_sorted_idx != -1:
+				_working_deck.append(str(found_sorted_idx))
 
 # ── Deck Grid (8 slots) ───────────────────────────────────────────────────────
 
@@ -210,9 +217,7 @@ func _build_collection_grid() -> void:
 		child.queue_free()
 	_collection_btn_map.clear()
 
-	var owned: Array[String] = SaveManager.get_owned_cards()
-	_sorted_owned_cards = owned.duplicate()
-	_sorted_owned_cards.sort()
+	_update_sorted_owned_cards()
 
 	for i in range(_sorted_owned_cards.size()):
 		var card_id: String = _sorted_owned_cards[i]
@@ -386,11 +391,33 @@ const SKILL_INFO := {
 	}
 }
 
+func _update_sorted_owned_cards() -> void:
+	var owned: Array[String] = SaveManager.get_owned_cards()
+	
+	var indices: Array[int] = []
+	for i in range(owned.size()):
+		indices.append(i)
+		
+	# Sort indices based on card_id alphabetically
+	indices.sort_custom(func(a: int, b: int):
+		return owned[a] < owned[b]
+	)
+	
+	_sorted_owned_cards.clear()
+	_sorted_owned_indices.clear()
+	for idx in indices:
+		_sorted_owned_cards.append(owned[idx])
+		_sorted_owned_indices.append(idx)
+
 func _show_detail(card_index: int) -> void:
+	var was_dialog_visible = $DetailOverlay/UpgradeDialog.visible
 	UIShell.hide_shell()
 	_detail_card_index = card_index
 	var card_id: String = _sorted_owned_cards[card_index]
-	var data: Dictionary = CardDatabase.get_effective_dict(card_id)
+	var original_idx: int = _sorted_owned_indices[card_index]
+	
+	# Load copy-specific effective stats!
+	var data: Dictionary = SaveManager.get_effective_card_dict(str(original_idx))
 	if data.is_empty():
 		return
 
@@ -407,7 +434,7 @@ func _show_detail(card_index: int) -> void:
 		art.visible = false
 
 	# Name & Level
-	var current_level: int = SaveManager.get_character_level(card_id)
+	var current_level: int = SaveManager.get_card_level_at(original_idx)
 	var char_name: String = data.get("name", card_id)
 	
 	# Try translating card name to Thai for UI aesthetics
@@ -459,8 +486,8 @@ func _show_detail(card_index: int) -> void:
 	# Join/Leave Team Button Text & Style
 	_refresh_join_team_btn(card_id)
 
-	# Make detail overlay visible (ensure UpgradeDialog is closed by default)
-	$DetailOverlay/UpgradeDialog.visible = false
+	# Restore dialog visibility rather than always closing it
+	$DetailOverlay/UpgradeDialog.visible = was_dialog_visible
 	$DetailOverlay.visible = true
 
 func _refresh_join_team_btn(card_id: String) -> void:
@@ -503,7 +530,8 @@ func _refresh_upgrade_dialog() -> void:
 	if _detail_card_index == -1:
 		return
 	var card_id: String = _sorted_owned_cards[_detail_card_index]
-	var data: Dictionary = CardDatabase.get_effective_dict(card_id)
+	var original_idx: int = _sorted_owned_indices[_detail_card_index]
+	var data: Dictionary = SaveManager.get_effective_card_dict(str(original_idx))
 	if data.is_empty():
 		return
 		
@@ -516,17 +544,19 @@ func _refresh_upgrade_dialog() -> void:
 		banner.visible = false
 
 	# Title Box Status
-	var current_level: int = SaveManager.get_character_level(card_id)
+	var current_level: int = SaveManager.get_card_level_at(original_idx)
 	var title_lbl := $DetailOverlay/UpgradeDialog/DialogPanel/TitleBox/TitleLbl
 	if current_level >= 5:
 		title_lbl.text = "TITLE\n🔓 Unlocked"
 	else:
 		title_lbl.text = "TITLE\n🔒 Locked"
 
-	# Build upgrade table rows (Levels 5 down to 2)
+	# Build upgrade table rows (Levels 5 down to 2) using pre-rolled paths
 	var table := $DetailOverlay/UpgradeDialog/DialogPanel/UpgradeTable
 	for child in table.get_children():
 		child.queue_free()
+
+	var path = SaveManager.get_card_upgrades_at(original_idx)
 
 	for lvl in range(5, 1, -1):
 		var row := Panel.new()
@@ -558,7 +588,9 @@ func _refresh_upgrade_dialog() -> void:
 		lbl.add_theme_font_size_override("font_size", 13)
 		lbl.add_theme_color_override("font_color", text_color)
 		
-		var boost_desc = "❤️ Life +1" if lvl == 5 else "⚡ Ability +1"
+		# Show the actual pre-rolled boost text for this level
+		var roll = path.get(str(lvl), {})
+		var boost_desc = roll.get("text", "Unknown")
 		lbl.text = "Lv. " + str(lvl) + "   |   " + boost_desc
 		
 		row.add_child(lbl)
@@ -581,8 +613,8 @@ func _refresh_upgrade_dialog() -> void:
 func _on_level_up_pressed() -> void:
 	if _detail_card_index == -1:
 		return
-	var card_id: String = _sorted_owned_cards[_detail_card_index]
-	if SaveManager.upgrade_character(card_id):
+	var original_idx: int = _sorted_owned_indices[_detail_card_index]
+	if SaveManager.upgrade_character_at(original_idx):
 		# Re-render Detail UI and Dialog with new level
 		UIShell.refresh_coins()
 		_show_detail(_detail_card_index)
@@ -642,7 +674,7 @@ func _on_set_active() -> void:
 	for idx_str in _working_deck:
 		var idx := int(idx_str)
 		if idx >= 0 and idx < _sorted_owned_cards.size():
-			cards_to_save.append(_sorted_owned_cards[idx])
+			cards_to_save.append(str(_sorted_owned_indices[idx]))
 	SaveManager.set_deck(_current_index, cards_to_save)
 	SaveManager.set_active_deck(_current_index)
 	_refresh_selector_buttons()
@@ -655,7 +687,7 @@ func _on_save() -> void:
 	for idx_str in _working_deck:
 		var idx := int(idx_str)
 		if idx >= 0 and idx < _sorted_owned_cards.size():
-			cards_to_save.append(_sorted_owned_cards[idx])
+			cards_to_save.append(str(_sorted_owned_indices[idx]))
 	SaveManager.set_deck(_current_index, cards_to_save)
 	_refresh_selector_buttons()
 	_refresh_action_bar()

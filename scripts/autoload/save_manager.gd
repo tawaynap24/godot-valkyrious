@@ -122,6 +122,10 @@ func _load() -> void:
 		var loaded = ResourceLoader.load(SAVE_PATH)
 		if loaded is PlayerData:
 			data = loaded
+			if data.individual_card_levels == null:
+				data.individual_card_levels = {}
+			if data.card_upgrades == null:
+				data.card_upgrades = {}
 			if data.coins <= 0:
 				data.coins = 1000000
 				_save()
@@ -193,18 +197,195 @@ func add_coins(amount: int) -> void:
 const UPGRADE_COST: int = 10
 const UPGRADE_MAX_LEVEL: int = 5
 
-func get_character_level(card_id: String) -> int:
-	return int(data.character_levels.get(card_id, 1))
+func get_card_level_at(idx: int) -> int:
+	_ensure_card_instance(idx)
+	return data.individual_card_levels.get(str(idx), 1)
 
-## Upgrades the character by 1 level. Returns true on success.
-func upgrade_character(card_id: String) -> bool:
-	var cur: int = get_character_level(card_id)
+func get_character_level(card_id: String) -> int:
+	# Fallback to the first copy of card_id in owned_cards
+	var owned = get_owned_cards()
+	var idx = owned.find(card_id)
+	if idx != -1:
+		return get_card_level_at(idx)
+	return 1
+
+## Upgrades the card copy at index `idx` by 1 level. Returns true on success.
+func upgrade_character_at(idx: int) -> bool:
+	_ensure_card_instance(idx)
+	var idx_str = str(idx)
+	var cur: int = data.individual_card_levels.get(idx_str, 1)
 	if cur >= UPGRADE_MAX_LEVEL:
 		return false
 	var cost = 10 * (cur + 1)
 	if data.coins < cost:
 		return false
 	data.coins -= cost
-	data.character_levels[card_id] = cur + 1
+	data.individual_card_levels[idx_str] = cur + 1
 	_save()
 	return true
+
+## Upgrades the character by 1 level. (Kept for compatibility, redirects to first copy)
+func upgrade_character(card_id: String) -> bool:
+	var owned = get_owned_cards()
+	var idx = owned.find(card_id)
+	if idx != -1:
+		return upgrade_character_at(idx)
+	return false
+
+func get_card_id_by_ref(ref: String) -> String:
+	if ref.is_valid_int():
+		var idx = int(ref)
+		var owned = get_owned_cards()
+		if idx >= 0 and idx < owned.size():
+			return owned[idx]
+	return ref
+
+## Returns the effective card stats dictionary for the card ref (index string or card_id string).
+func get_effective_card_dict(ref: String) -> Dictionary:
+	if ref.is_valid_int():
+		var idx = int(ref)
+		var owned = get_owned_cards()
+		if idx >= 0 and idx < owned.size():
+			var card_id = owned[idx]
+			var base = CardDatabase.CARDS.get(card_id, {})
+			if base.is_empty():
+				return {}
+			var d = base.duplicate()
+			
+			_ensure_card_instance(idx)
+			
+			var idx_str = str(idx)
+			var level = data.individual_card_levels.get(idx_str, 1)
+			d["level"] = level
+			
+			var atk_boost = 0
+			var hp_boost = 0
+			var path = data.card_upgrades.get(idx_str, {})
+			for l in range(2, level + 1):
+				var roll = path.get(str(l), {})
+				atk_boost += roll.get("atk", 0)
+				hp_boost += roll.get("hp", 0)
+				
+			d["atk"] = base.get("atk", 1) + atk_boost
+			d["hp"] = base.get("hp", 1) + hp_boost
+			return d
+	return CardDatabase.get_effective_dict(ref)
+
+func get_card_upgrades_at(idx: int) -> Dictionary:
+	_ensure_card_instance(idx)
+	return data.card_upgrades.get(str(idx), {})
+
+func _ensure_card_instance(idx: int) -> void:
+	var idx_str = str(idx)
+	var owned = get_owned_cards()
+	if idx < 0 or idx >= owned.size():
+		return
+		
+	if not data.individual_card_levels.has(idx_str):
+		data.individual_card_levels[idx_str] = 1
+		
+	if not data.card_upgrades.has(idx_str):
+		var card_id = owned[idx]
+		var base_stats = CardDatabase.CARDS.get(card_id, {})
+		var base_atk = base_stats.get("atk", 1)
+		var base_hp = base_stats.get("hp", 1)
+		
+		var path = {}
+		var current_atk = base_atk
+		var current_hp = base_hp
+		
+		for lvl in range(2, 6):
+			var roll = _roll_upgrade_for_level(lvl, current_atk, current_hp)
+			path[str(lvl)] = roll
+			current_atk += roll["atk"]
+			current_hp += roll["hp"]
+			
+		data.card_upgrades[idx_str] = path
+		_save()
+
+func _roll_upgrade_for_level(lvl: int, cur_atk: int, cur_hp: int) -> Dictionary:
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	
+	while true:
+		var type = ""
+		var atk_diff = 0
+		var hp_diff = 0
+		var text = ""
+		
+		var roll_val = rng.randi_range(1, 100)
+		
+		if lvl == 2:
+			# lvl2 50:50:0:0 
+			if roll_val <= 50:
+				type = "HP"
+				hp_diff = 1
+				text = "❤️ Life +1"
+			else:
+				type = "ATK"
+				atk_diff = 1
+				text = "👊 ATK +1"
+		elif lvl == 3:
+			# lvl3 35:35:20:10
+			if roll_val <= 35:
+				type = "HP"
+				hp_diff = 1
+				text = "❤️ Life +1"
+			elif roll_val <= 70:
+				type = "ATK"
+				atk_diff = 1
+				text = "👊 ATK +1"
+			elif roll_val <= 90:
+				type = "ABILITY"
+				atk_diff = 1
+				text = "⚡ Ability +1"
+			else:
+				type = "SPECIAL_STAT"
+				var spec_roll = rng.randi_range(1, 3)
+				if spec_roll == 1:
+					hp_diff = 2
+					atk_diff = -1
+					text = "❤️ Life +2  👊 ATK -1"
+				elif spec_roll == 2:
+					atk_diff = 2
+					text = "👊 ATK +2"
+				else:
+					hp_diff = -1
+					text = "❤️ Life -1"
+		else:
+			# lvl4 & lvl5 25:25:30:20
+			if roll_val <= 25:
+				type = "HP"
+				hp_diff = 2
+				text = "❤️ Life +2"
+			elif roll_val <= 50:
+				type = "ATK"
+				atk_diff = 2
+				text = "👊 ATK +2"
+			elif roll_val <= 80:
+				type = "ABILITY"
+				atk_diff = 1
+				text = "⚡ Ability +1"
+			else:
+				type = "SPECIAL_STAT"
+				var spec_roll = rng.randi_range(1, 3)
+				if spec_roll == 1:
+					hp_diff = 3
+					atk_diff = -1
+					text = "❤️ Life +3  👊 ATK -1"
+				elif spec_roll == 2:
+					atk_diff = 3
+					text = "👊 ATK +3"
+				else:
+					hp_diff = -1
+					text = "❤️ Life -1"
+					
+		# Check if resulting stats > 0
+		if cur_atk + atk_diff > 0 and cur_hp + hp_diff > 0:
+			return {
+				"type": type,
+				"atk": atk_diff,
+				"hp": hp_diff,
+				"text": text
+			}
+	return {}

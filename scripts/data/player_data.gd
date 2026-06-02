@@ -25,6 +25,8 @@ class_name PlayerData
 # ── Upgrade System ────────────────────────────────────────────────────────────
 @export var coins: int = 1000000
 @export var character_levels: Dictionary = {}  # card_id → level (int 1–5)
+@export var individual_card_levels: Dictionary = {}  # instance_idx (String) -> level (int)
+@export var card_upgrades: Dictionary = {}            # instance_idx (String) -> upgrades path (Dictionary)
 @export var data_version: int = 0
 
 func get_deck(index: int) -> Array[String]:

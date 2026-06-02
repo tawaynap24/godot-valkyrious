@@ -26,11 +26,12 @@ func draw_card():
 	var cm: Variant = get_node("../CardManager")
 	cm.add_child(new_card)
 	new_card.name = "Card"
-	var cdata: Dictionary = CardDatabase.get_effective_dict(card_id)
+	var cdata: Dictionary = SaveManager.get_effective_card_dict(card_id)
 	new_card.setup(cdata)
 	var player_hand: Variant = $"../PlayerHand"
 	player_hand.add_card_to_hand(new_card, CARD_DRAW_SPEED)
-	BattleLogger.log_card_draw("owner", card_id, cdata.get("name", ""))
+	var actual_card_id = SaveManager.get_card_id_by_ref(card_id)
+	BattleLogger.log_card_draw("owner", actual_card_id, cdata.get("name", ""))
 
 func return_card(card_id: String) -> void:
 	player_deck.append(card_id)
