@@ -108,9 +108,8 @@ func has_owned_card(id: String) -> bool:
 	return data.owned_cards.has(id)
 
 func own_card(id: String) -> void:
-	if not data.owned_cards.has(id):
-		data.owned_cards.append(id)
-		_save()
+	data.owned_cards.append(id)
+	_save()
 
 func own_all_cards() -> void:
 	data.owned_cards.assign(CardDatabase.CARDS.keys())

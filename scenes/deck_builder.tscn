@@ -33,6 +33,10 @@ corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_collection_bg"]
 bg_color = Color(0.88, 0.94, 1, 1)
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail_panel"]
 bg_color = Color(0.96, 0.98, 1, 1)
@@ -469,15 +473,17 @@ autowrap_mode = 2
 offset_left = 8.0
 offset_top = 463.0
 offset_right = 568.0
-offset_bottom = 913.0
+offset_bottom = 846.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_collection_bg")
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
 
 [node name="CollectionGrid" type="GridContainer" parent="CollectionScroll" unique_id=150467849]
-custom_minimum_size = Vector2(552, 0)
+custom_minimum_size = Vector2(544, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 3
-theme_override_constants/v_separation = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 columns = 4
 
 [node name="HoldTimer" type="Timer" parent="." unique_id=1117017461]

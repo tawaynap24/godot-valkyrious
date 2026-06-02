@@ -45,21 +45,30 @@ var _working_deck: Array[String] = []
 
 # Hold-to-detail state
 var _held_card_id: String = ""
+var _held_button_index: int = -1
 var _hold_press_pos: Vector2 = Vector2.ZERO
 var _hold_triggered: bool = false
 const HOLD_DRAG_THRESHOLD: float = 10.0
 
 
 
-# Maps card_id → Button node in the collection grid so we can refresh
+# Maps index (int) → Button node in the collection grid so we can refresh
 # highlights without destroying and recreating all nodes
 var _collection_btn_map: Dictionary = {}
+var _sorted_owned_cards: Array[String] = []
+
 
 # ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
 	_connect_signals()
 	_current_index = SaveManager.get_active_index()
+	
+	# Populate _sorted_owned_cards first, since _load_working_deck requires it
+	var owned: Array[String] = SaveManager.get_owned_cards()
+	_sorted_owned_cards = owned.duplicate()
+	_sorted_owned_cards.sort()
+	
 	_load_working_deck()
 	_build_collection_grid()
 	_refresh_deck_ui()
@@ -97,7 +106,19 @@ func _switch_preset(index: int) -> void:
 	_refresh_collection_highlights()   # resync in-deck highlights without rebuild
 
 func _load_working_deck() -> void:
-	_working_deck = SaveManager.get_deck(_current_index)
+	var saved_deck = SaveManager.get_deck(_current_index)
+	_working_deck.clear()
+	
+	var used_indices := {}
+	for card_id in saved_deck:
+		var found_idx := -1
+		for idx in range(_sorted_owned_cards.size()):
+			if _sorted_owned_cards[idx] == card_id and not used_indices.has(idx):
+				found_idx = idx
+				break
+		if found_idx != -1:
+			_working_deck.append(str(found_idx))
+			used_indices[found_idx] = true
 
 # ── Deck Grid (8 slots) ───────────────────────────────────────────────────────
 
@@ -124,9 +145,10 @@ func _refresh_deck_ui() -> void:
 		var slot: Panel = grid.get_child(i)
 		var lbl: Label       = slot.get_node("CardLabel")
 		var art: TextureRect = slot.get_node("ArtworkRect")
-
 		if i < _working_deck.size():
-			var card_id: String = _working_deck[i]
+			var idx_str: String = _working_deck[i]
+			var idx: int = int(idx_str)
+			var card_id: String = _sorted_owned_cards[idx]
 			var card_data: Dictionary = CardDatabase.CARDS.get(card_id, {})
 
 			# Artwork — top 148px of 180px slot, leaving 32px name strip below
@@ -184,16 +206,17 @@ func _build_collection_grid() -> void:
 	_collection_btn_map.clear()
 
 	var owned: Array[String] = SaveManager.get_owned_cards()
-	var card_ids: Array = owned.duplicate()
-	card_ids.sort()
+	_sorted_owned_cards = owned.duplicate()
+	_sorted_owned_cards.sort()
 
-	for card_id in card_ids:
+	for i in range(_sorted_owned_cards.size()):
+		var card_id: String = _sorted_owned_cards[i]
 		var card_data: Dictionary = CardDatabase.CARDS.get(card_id, {})
-		var in_deck: bool = _working_deck.has(card_id)
+		var in_deck: bool = _is_button_in_deck(i, card_id)
 
 		# Container: clips artwork to card bounds
 		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(138, 172)
+		btn.custom_minimum_size = Vector2(130, 162)
 		btn.clip_contents = true
 		# Remove default button padding so artwork fills the whole button
 		var sbf_btn := StyleBoxFlat.new()
@@ -265,9 +288,9 @@ func _build_collection_grid() -> void:
 			btn.modulate = Color(0.72, 0.72, 0.72, 1.0)
 
 		# All interaction handled in gui_input (tap + hold-to-detail)
-		btn.gui_input.connect(_on_card_gui_input.bind(card_id))
+		btn.gui_input.connect(_on_card_gui_input.bind(i, card_id))
 
-		_collection_btn_map[card_id] = btn
+		_collection_btn_map[i] = btn
 		grid.add_child(btn)
 
 func _try_load_texture(path: String) -> Texture2D:
@@ -275,46 +298,52 @@ func _try_load_texture(path: String) -> Texture2D:
 
 # ── Add Card ──────────────────────────────────────────────────────────────────
 
-func _toggle_collection_card(card_id: String) -> void:
+func _toggle_collection_card(button_index: int, card_id: String) -> void:
 	# Toggle: remove if already in deck
-	var idx: int = _working_deck.find(card_id)
-	if idx != -1:
-		_working_deck.remove_at(idx)
+	var in_deck: bool = _is_button_in_deck(button_index, card_id)
+	if in_deck:
+		var idx: int = _working_deck.find(str(button_index))
+		if idx != -1:
+			_working_deck.remove_at(idx)
+			_refresh_deck_ui()
+			_refresh_collection_highlights()
+			_refresh_action_bar()
+			return
+	else:
+		# Add: check capacity
+		if _working_deck.size() >= DECK_SIZE:
+			return
+		# Add: enforce unique name per deck
+		if _deck_has_name(card_id):
+			return
+		_working_deck.append(str(button_index))
 		_refresh_deck_ui()
 		_refresh_collection_highlights()
 		_refresh_action_bar()
-		return
-	# Add: check capacity
-	if _working_deck.size() >= DECK_SIZE:
-		return
-	# Add: enforce unique name per deck
-	if _deck_has_name(card_id):
-		return
-	_working_deck.append(card_id)
-	_refresh_deck_ui()
-	_refresh_collection_highlights()
-	_refresh_action_bar()
 
 # ── Hold-to-Detail ────────────────────────────────────────────────────────────
 
-func _on_card_gui_input(event: InputEvent, card_id: String) -> void:
+func _on_card_gui_input(event: InputEvent, button_index: int, card_id: String) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			_hold_triggered = false
 			_held_card_id = card_id
+			_held_button_index = button_index
 			_hold_press_pos = event.position
 			$HoldTimer.start()
 		else:
 			$HoldTimer.stop()
-			if _held_card_id == card_id and not _hold_triggered:
-				_toggle_collection_card(card_id)
+			if _held_card_id == card_id and _held_button_index == button_index and not _hold_triggered:
+				_toggle_collection_card(button_index, card_id)
 			_held_card_id = ""
+			_held_button_index = -1
 	elif event is InputEventMouseMotion:
 		if _held_card_id != "":
 			var pos: Vector2 = event.position
 			if pos.distance_to(_hold_press_pos) > HOLD_DRAG_THRESHOLD:
 				$HoldTimer.stop()
 				_held_card_id = ""
+				_held_button_index = -1
 
 func _on_hold_complete() -> void:
 	if _held_card_id != "":
@@ -393,11 +422,12 @@ func _on_dim_input(event: InputEvent) -> void:
 # Much cheaper than _build_collection_grid() — does NOT touch the texture or
 # recreate any nodes.
 func _refresh_collection_highlights() -> void:
-	for card_id in _collection_btn_map:
-		var btn: Button = _collection_btn_map[card_id]
+	for i in _collection_btn_map:
+		var btn: Button = _collection_btn_map[i]
 		if not is_instance_valid(btn):
 			continue
-		var in_deck: bool = _working_deck.has(card_id)
+		var card_id: String = _sorted_owned_cards[i]
+		var in_deck: bool = _is_button_in_deck(i, card_id)
 
 		# Update border colour on the StyleBoxFlat we stored earlier
 		var sbf := btn.get_theme_stylebox("normal") as StyleBoxFlat
@@ -431,6 +461,12 @@ func _refresh_collection_highlights() -> void:
 func _on_set_active() -> void:
 	if _working_deck.size() < DECK_SIZE:
 		return
+	var cards_to_save: Array[String] = []
+	for idx_str in _working_deck:
+		var idx := int(idx_str)
+		if idx >= 0 and idx < _sorted_owned_cards.size():
+			cards_to_save.append(_sorted_owned_cards[idx])
+	SaveManager.set_deck(_current_index, cards_to_save)
 	SaveManager.set_active_deck(_current_index)
 	_refresh_selector_buttons()
 	_refresh_action_bar()
@@ -438,7 +474,12 @@ func _on_set_active() -> void:
 func _on_save() -> void:
 	if _working_deck.size() < DECK_SIZE:
 		return
-	SaveManager.set_deck(_current_index, _working_deck)
+	var cards_to_save: Array[String] = []
+	for idx_str in _working_deck:
+		var idx := int(idx_str)
+		if idx >= 0 and idx < _sorted_owned_cards.size():
+			cards_to_save.append(_sorted_owned_cards[idx])
+	SaveManager.set_deck(_current_index, cards_to_save)
 	_refresh_selector_buttons()
 	_refresh_action_bar()
 
@@ -446,7 +487,7 @@ func _on_cancel_edit() -> void:
 	_do_cancel_edit()
 
 func _do_cancel_edit() -> void:
-	_working_deck = SaveManager.get_deck(_current_index)
+	_load_working_deck()
 	_refresh_deck_ui()
 	_refresh_collection_highlights()
 	_refresh_action_bar()
@@ -502,10 +543,16 @@ func _short_name(card_id: String) -> String:
 
 func _deck_has_name(card_id: String) -> bool:
 	var new_name: String = CardDatabase.CARDS.get(card_id, {}).get("name", card_id)
-	for existing_id in _working_deck:
-		if CardDatabase.CARDS.get(existing_id, {}).get("name", existing_id) == new_name:
-			return true
+	for idx_str in _working_deck:
+		var idx := int(idx_str)
+		if idx >= 0 and idx < _sorted_owned_cards.size():
+			var existing_id: String = _sorted_owned_cards[idx]
+			if CardDatabase.CARDS.get(existing_id, {}).get("name", existing_id) == new_name:
+				return true
 	return false
+
+func _is_button_in_deck(button_index: int, _card_id: String) -> bool:
+	return _working_deck.has(str(button_index))
 
 func _on_back() -> void:
 	SceneManager.go_to_lobby()

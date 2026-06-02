@@ -9,8 +9,8 @@ extends Node2D
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Gacha economy ──────────────────────────────────────────────────────────────
-const GACHA_COST_X1: int  = 1
-const GACHA_COST_X10: int = 10
+const GACHA_COST_X1: int  = 100
+const GACHA_COST_X10: int = 1000
 
 # ── Gacha odds (Bronze 70% | Silver 25% | Gold 5%) ────────────────────────────
 const ODDS_GOLD:   float = 5.0
