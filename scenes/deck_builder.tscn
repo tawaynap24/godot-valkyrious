@@ -85,7 +85,7 @@ theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_back_n")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_back_h")
 theme_override_styles/hover = SubResource("StyleBoxFlat_back_h")
-text = "โ Back"
+text = "← Back"
 
 [node name="TitleLabel" type="Label" parent="TopBar" unique_id=275717008]
 layout_mode = 0
@@ -580,4 +580,4 @@ theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_close_n")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_close_h")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_h")
-text = "โ•   Close"
+text = "✖   Close"

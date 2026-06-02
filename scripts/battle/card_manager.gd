@@ -482,8 +482,6 @@ func _remove_from_field(card) -> void:
 		if is_instance_valid(fc) and fc.locked_target == card:
 			fc.locked_target = null
 	card.set_attack_arrow("")
-	if card.current_hp <= 0:
-		skill_resolver.trigger_skills(card, "remove")
 	card.queue_free()
 
 func _refresh_all_arrows() -> void:

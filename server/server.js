@@ -174,7 +174,11 @@ function relayGameOver(ws, winner) {
   if (opp) send(opp, { type: "game_over", winner });
   console.log(`[Room ${code}] Game over — winner: ${winner}`);
   // Clean up after a short delay so both clients receive the message
-  setTimeout(() => cleanRoom(code), 10_000);
+  setTimeout(() => {
+    if (rooms.get(code) === room) {
+      cleanRoom(code);
+    }
+  }, 10_000);
 }
 
 // ── Disconnect ────────────────────────────────────────────────────────────────
