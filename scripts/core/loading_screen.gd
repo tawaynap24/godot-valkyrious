@@ -14,7 +14,7 @@ func _ready() -> void:
 		_run_initial_preload.call_deferred()
 	else:
 		# ── Battle scene path (threaded background load) ──────────────────────
-		$StatusLabel.text = "Loading battle..."
+		$StatusLabel.text = tr("UI_LOADING_BATTLE")
 		ResourceLoader.load_threaded_request(_target)
 
 # ── Initial Preload (runs once on first launch) ───────────────────────────────
@@ -23,13 +23,13 @@ func _run_initial_preload() -> void:
 	if GameCache.is_preloaded():
 		# Already done in a previous session visit — skip straight to Lobby
 		$ProgressBar.value = 100.0
-		$StatusLabel.text = "Ready!"
+		$StatusLabel.text = tr("UI_READY")
 		await get_tree().create_timer(0.1).timeout
 		SceneManager.go_to_lobby()
 		return
 
 	# Stage 1 — Card battle scene (0 → 15%)
-	$StatusLabel.text = "Loading card scene..."
+	$StatusLabel.text = tr("UI_LOADING_CARD_SCENE")
 	$ProgressBar.value = 5.0
 	await get_tree().process_frame
 
@@ -51,13 +51,13 @@ func _run_initial_preload() -> void:
 		# Update UI every 4 cards to keep the progress bar smooth
 		if i % 4 == 0:
 			$ProgressBar.value = 15.0 + 80.0 * float(i + 1) / float(n)
-			$StatusLabel.text = "Loading artwork... (%d / %d)" % [i + 1, n]
+			$StatusLabel.text = tr("UI_LOADING_ARTWORK") % [i + 1, n]
 			await get_tree().process_frame
 
 	# Stage 3 — Done
 	GameCache.mark_preloaded()
 	$ProgressBar.value = 100.0
-	$StatusLabel.text = "Ready!"
+	$StatusLabel.text = tr("UI_READY")
 	await get_tree().create_timer(0.2).timeout
 	SceneManager.go_to_lobby()
 

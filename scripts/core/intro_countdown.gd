@@ -1,13 +1,13 @@
 extends Node2D
 
 const STEP_DURATION: float = 1.0
-const STEPS: Array = ["3", "2", "1", "READY!"]
+const STEPS: Array = ["3", "2", "1", "UI_READY_UPPER"]
 
 var _step: int = 0
 var _timer: float = 0.0
 
 func _ready() -> void:
-	$CountdownLabel.text = STEPS[0]
+	$CountdownLabel.text = tr(STEPS[0])
 
 func _process(delta: float) -> void:
 	_timer += delta
@@ -20,4 +20,4 @@ func _process(delta: float) -> void:
 		get_parent().start_game()
 		set_process(false)
 	else:
-		$CountdownLabel.text = STEPS[_step]
+		$CountdownLabel.text = tr(STEPS[_step])

@@ -75,6 +75,8 @@ func _ready() -> void:
 	_refresh_selector_buttons()
 	_refresh_action_bar()
 	UIShell.set_active_tab("deck")
+	
+	_init_stat_calc_labels()
 
 # ── Signal Wiring ─────────────────────────────────────────────────────────────
 
@@ -84,6 +86,7 @@ func _connect_signals() -> void:
 	$DeckSelectorBar/Deck2Btn.pressed.connect(func(): _switch_preset(2))
 	$DeckSelectorBar/Deck3Btn.pressed.connect(func(): _switch_preset(3))
 	$ActionBar/SetActiveBtn.pressed.connect(_on_set_active)
+	$ActionBar/ClearNonDefaultBtn.pressed.connect(_on_clear_non_default_pressed)
 	$ActionBar/SaveBtn.pressed.connect(_on_save)
 	$ActionBar/CancelBtn.pressed.connect(_on_cancel_edit)
 	$HoldTimer.timeout.connect(_on_hold_complete)
@@ -161,9 +164,10 @@ func _refresh_deck_ui() -> void:
 			var idx_str: String = _working_deck[i]
 			var idx: int = int(idx_str)
 			var card_id: String = _sorted_owned_cards[idx]
-			var card_data: Dictionary = CardDatabase.CARDS.get(card_id, {})
+			var original_idx: int = _sorted_owned_indices[idx]
+			var card_data: Dictionary = SaveManager.get_effective_card_dict(str(original_idx))
 
-			# Artwork — top 148px of 180px slot, leaving 32px name strip below
+			# Artwork — top 132px of 180px slot, leaving 48px name strip below
 			var _has_art: bool = false
 			if card_data.get("has_image", false):
 				var tex := _try_load_texture(card_data.get("image_path", ""))
@@ -173,20 +177,27 @@ func _refresh_deck_ui() -> void:
 					art.anchor_left = 0.0; art.anchor_top = 0.0
 					art.anchor_right = 1.0; art.anchor_bottom = 0.0
 					art.offset_left = 0.0; art.offset_top = 0.0
-					art.offset_right = 0.0; art.offset_bottom = 148.0
+					art.offset_right = 0.0; art.offset_bottom = 132.0
 					art.visible = true
 					_has_art = true
 			if not _has_art:
 				art.texture = null
 				art.visible = false
 
-			# Name — bottom strip on white background
-			lbl.text = _short_name(card_id)
+			# Cost label cleanup if any
+			var cost_lbl = slot.get_node_or_null("CostLabel")
+			if cost_lbl:
+				cost_lbl.queue_free()
+
+			# Name & Stats — bottom strip on white background
+			lbl.text = _short_name(card_id) + "\nLv." + str(card_data.get("level", 1)) + "  💎" + str(card_data.get("cost", 1)) + "  👊" + str(card_data.get("atk", 1)) + "  ❤️" + str(card_data.get("hp", 1))
 			lbl.add_theme_color_override("font_color", Color(0.08, 0.14, 0.35, 1))
 			lbl.anchor_top = 1.0; lbl.anchor_bottom = 1.0
-			lbl.offset_top = -32.0; lbl.offset_bottom = -2.0
-			lbl.offset_left = 2.0; lbl.offset_right = -26.0
+			lbl.offset_top = -48.0; lbl.offset_bottom = -2.0
+			lbl.offset_left = 2.0; lbl.offset_right = -2.0
+			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lbl.add_theme_font_size_override("font_size", 10)
 
 			slot.clip_contents = true
 			slot.add_theme_stylebox_override("panel", sbf_filled)
@@ -196,16 +207,21 @@ func _refresh_deck_ui() -> void:
 			# Restore artwork anchors to full rect for next fill
 			art.anchor_bottom = 1.0; art.offset_bottom = 0.0
 
-			lbl.text = "— empty —"
+			lbl.text = tr("UI_EMPTY")
 			lbl.add_theme_color_override("font_color", C_TEXT_MUTED)
 			# Restore original bottom-anchored label position
 			lbl.anchor_top = 1.0; lbl.anchor_bottom = 1.0
 			lbl.offset_top = -38.0; lbl.offset_bottom = -2.0
 			lbl.offset_left = 2.0; lbl.offset_right = -28.0
 			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lbl.remove_theme_font_size_override("font_size")
 
 			slot.clip_contents = false
 			slot.add_theme_stylebox_override("panel", sbf_empty)
+
+			var cost_lbl = slot.get_node_or_null("CostLabel")
+			if cost_lbl:
+				cost_lbl.queue_free()
 
 # ── Collection Grid ───────────────────────────────────────────────────────────
 
@@ -221,7 +237,8 @@ func _build_collection_grid() -> void:
 
 	for i in range(_sorted_owned_cards.size()):
 		var card_id: String = _sorted_owned_cards[i]
-		var card_data: Dictionary = CardDatabase.CARDS.get(card_id, {})
+		var original_idx: int = _sorted_owned_indices[i]
+		var card_data: Dictionary = SaveManager.get_effective_card_dict(str(original_idx))
 		var in_deck: bool = _is_button_in_deck(i, card_id)
 
 		# Container: clips artwork to card bounds
@@ -257,21 +274,21 @@ func _build_collection_grid() -> void:
 				art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 				btn.add_child(art)
 
-		# Bottom info bar: name + cost overlaid on artwork
+		# Bottom info bar: name + stats overlaid on artwork
 		var bar := ColorRect.new()
-		bar.color = Color(0, 0, 0, 0.52)
+		bar.color = Color(0, 0, 0, 0.6)
 		bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-		bar.offset_top = -42.0
+		bar.offset_top = -48.0
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(bar)
 
 		var lbl := Label.new()
-		lbl.text = _short_name(card_id) + "\n💰" + str(card_data.get("cost", "?"))
+		lbl.text = _short_name(card_id) + "\nLv." + str(card_data.get("level", 1)) + "  💎" + str(card_data.get("cost", 1)) + "  👊" + str(card_data.get("atk", 1)) + "  ❤️" + str(card_data.get("hp", 1))
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-		lbl.offset_top = -42.0
-		lbl.add_theme_font_size_override("font_size", 11)
+		lbl.offset_top = -48.0
+		lbl.add_theme_font_size_override("font_size", 10)
 		lbl.add_theme_color_override("font_color", Color(1, 1, 1, 1))
 		lbl.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 1))
 		lbl.add_theme_constant_override("shadow_offset_x", 1)
@@ -282,7 +299,7 @@ func _build_collection_grid() -> void:
 		# "In Deck" badge
 		if in_deck:
 			var badge := Label.new()
-			badge.text = "✓ In Deck"
+			badge.text = tr("UI_IN_DECK")
 			badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			badge.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -371,26 +388,6 @@ func _on_deck_slot_input(event: InputEvent, slot_index: int) -> void:
 
 # ── Card Detail Overlay ───────────────────────────────────────────────────────
 
-# Character-specific skill translations to make it look premium
-const SKILL_INFO := {
-	"death_burst_ange": {
-		"name": "✨ ระเบิดพลีชีพ",
-		"desc": "เมื่อถูกกำจัด จะสร้างความเสียหาย 4 หน่วยแก่ศัตรูทั้งหมด"
-	},
-	"stun_lowest_countdown": {
-		"name": "✨ คลื่นช็อกเวฟ",
-		"desc": "ทำให้ศัตรูที่มีคูลดาวน์เคลื่อนไหวต่ำสุด ติดสถานะมึนงง"
-	},
-	"stun_enemy": {
-		"name": "✨ หมัดอัมพาต",
-		"desc": "ทำให้ศัตรูที่ถูกโจมตีติดสถานะมึนงง"
-	},
-	"benita": {
-		"name": "✨ ระเบิดโทสะ",
-		"desc": "เมื่อได้รับความเสียหาย จะมอบพลังโจมตี +2 แก่ตนเอง"
-	}
-}
-
 func _update_sorted_owned_cards() -> void:
 	var owned: Array[String] = SaveManager.get_owned_cards()
 	
@@ -436,47 +433,31 @@ func _show_detail(card_index: int) -> void:
 	# Name & Level
 	var current_level: int = SaveManager.get_card_level_at(original_idx)
 	var char_name: String = data.get("name", card_id)
-	
-	# Try translating card name to Thai for UI aesthetics
-	var thai_names := {
-		"benita": "เบนิต้า",
-		"ange": "แอนจ์",
-		"ariana": "อารีอานา",
-		"nicole": "นิโคล",
-		"ran": "รัน",
-		"sia": "เซีย",
-		"victoria": "วิคตอเรีย",
-		"jenny": "เจนนี่"
-	}
-	var display_name: String = thai_names.get(card_id.to_lower(), char_name)
+	var display_name: String = tr(char_name)
 	$DetailOverlay/MainDetailView/InfoPanel/LevelNameLabel.text = "Lv." + str(current_level) + " " + display_name
 
 	# Stats
-	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/CostBox/Val.text = str(data.get("cost", "?"))
-	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/AtkBox/Val.text = str(data.get("atk", "?"))
-	$DetailOverlay/MainDetailView/InfoPanel/StatsHBox/HpBox/Val.text = str(data.get("hp", "?"))
+	var base_cost: int = CardDatabase.CARDS.get(card_id, {}).get("cost", 1)
+	var base_atk: int = CardDatabase.CARDS.get(card_id, {}).get("atk", 1)
+	var base_hp: int = CardDatabase.CARDS.get(card_id, {}).get("hp", 1)
+	
+	var eff_cost: int = data.get("cost", base_cost)
+	var eff_atk: int = data.get("atk", base_atk)
+	var eff_hp: int = data.get("hp", base_hp)
+	
+	_update_stat_box("CostBox", base_cost, eff_cost)
+	_update_stat_box("AtkBox", base_atk, eff_atk)
+	_update_stat_box("HpBox", base_hp, eff_hp)
 
 	# Skill Name & Desc
-	var skill_id: String = ""
-	var skills: Array = data.get("skills", [])
-	if not skills.is_empty():
-		skill_id = str(skills[0])
-	
-	# Look up translation or use fallback
-	var sk_name: String = "✨ ไม่มีสกิล"
-	var sk_desc: String = "ฮีโร่ตัวนี้ไม่มีสกิลติดตัว"
-	
-	if SKILL_INFO.has(skill_id):
-		sk_name = SKILL_INFO[skill_id]["name"]
-		sk_desc = SKILL_INFO[skill_id]["desc"]
-	elif SKILL_INFO.has(card_id):
-		sk_name = SKILL_INFO[card_id]["name"]
-		sk_desc = SKILL_INFO[card_id]["desc"]
-	elif skill_id != "":
-		sk_name = "✨ " + skill_id
-		sk_desc = "คำอธิบายสำหรับสกิล " + skill_id
+	var sk_name: String = data.get("skill_name", "")
+	if sk_name == "":
+		sk_name = "UI_NO_SKILL"
+	var skill_level = data.get("skill_level", 1)
+	var skill_desc_template = data.get("skill_description", "")
+	var sk_desc = CardDatabase.get_scaled_skill_desc(card_id, skill_desc_template, skill_level)
 		
-	$DetailOverlay/MainDetailView/InfoPanel/SkillPanel/SkillName.text = sk_name
+	$DetailOverlay/MainDetailView/InfoPanel/SkillPanel/SkillName.text = tr(sk_name)
 	$DetailOverlay/MainDetailView/InfoPanel/SkillPanel/SkillDesc.text = sk_desc
 
 	# Enable/Disable character navigation arrows
@@ -490,14 +471,47 @@ func _show_detail(card_index: int) -> void:
 	$DetailOverlay/UpgradeDialog.visible = was_dialog_visible
 	$DetailOverlay.visible = true
 
+
+
+func _get_formatted_boost_text(card_id: String, skill_id: String, roll: Dictionary, prev_skill_level: int) -> String:
+	var t = roll.get("text", "")
+	if t != "" and t != "Unknown":
+		return t.replace("Life", "HP")
+		
+	# Reconstruct text dynamically from roll stats
+	var type = roll.get("type", "")
+	var atk = roll.get("atk", 0)
+	var hp = roll.get("hp", 0)
+	var cost = roll.get("cost", 0)
+	
+	var parts = []
+	if type == "ABILITY":
+		parts.append("⚡ Ability +1")
+	if cost != 0:
+		parts.append("🪙 Cost %s%d" % ["+" if cost > 0 else "", cost])
+	if atk != 0:
+		parts.append("👊 ATK %s%d" % ["+" if atk > 0 else "", atk])
+	if hp != 0:
+		parts.append("❤️ HP %s%d" % ["+" if hp > 0 else "", hp])
+		
+	if parts.is_empty():
+		return "No Boost"
+	return "  ".join(parts)
+
 func _refresh_join_team_btn(card_id: String) -> void:
 	var join_btn := $DetailOverlay/MainDetailView/BottomBar/JoinTeamBtn
+	var upgrade_btn := $DetailOverlay/MainDetailView/BottomBar/UpgradeBtn
 	var is_in_deck: bool = _working_deck.has(str(_detail_card_index))
 	
 	if is_in_deck:
-		join_btn.text = "ออกจากทีม"
+		join_btn.visible = false
+		upgrade_btn.offset_left = 188
+		upgrade_btn.offset_right = 388
 	else:
-		join_btn.text = "เข้าร่วมทีม"
+		join_btn.visible = true
+		join_btn.text = tr("Add to Deck")
+		upgrade_btn.offset_left = 110
+		upgrade_btn.offset_right = 310
 		
 	# Disable if name is already taken or deck is full
 	var name_taken = _deck_has_name(card_id) and not is_in_deck
@@ -547,9 +561,9 @@ func _refresh_upgrade_dialog() -> void:
 	var current_level: int = SaveManager.get_card_level_at(original_idx)
 	var title_lbl := $DetailOverlay/UpgradeDialog/DialogPanel/TitleBox/TitleLbl
 	if current_level >= 5:
-		title_lbl.text = "TITLE\n🔓 Unlocked"
+		title_lbl.text = tr("TITLE\n🔓 Unlocked")
 	else:
-		title_lbl.text = "TITLE\n🔒 Locked"
+		title_lbl.text = tr("TITLE\n🔒 Locked")
 
 	# Build upgrade table rows (Levels 5 down to 2) using pre-rolled paths
 	var table := $DetailOverlay/UpgradeDialog/DialogPanel/UpgradeTable
@@ -557,6 +571,15 @@ func _refresh_upgrade_dialog() -> void:
 		child.queue_free()
 
 	var path = SaveManager.get_card_upgrades_at(original_idx)
+
+	# Pre-calculate skill levels at each stage (lvl 1 to 5)
+	var skill_levels = {1: 1}
+	var current_sl = 1
+	for l in range(2, 6):
+		var roll = path.get(str(l), {})
+		if roll.get("type", "") == "ABILITY":
+			current_sl += 1
+		skill_levels[l] = current_sl
 
 	for lvl in range(5, 1, -1):
 		var row := Panel.new()
@@ -590,7 +613,14 @@ func _refresh_upgrade_dialog() -> void:
 		
 		# Show the actual pre-rolled boost text for this level
 		var roll = path.get(str(lvl), {})
-		var boost_desc = roll.get("text", "Unknown")
+		var prev_sl = skill_levels[lvl - 1]
+		
+		var skill_id = ""
+		var skills = data.get("skills", [])
+		if not skills.is_empty():
+			skill_id = str(skills[0])
+			
+		var boost_desc = tr(_get_formatted_boost_text(card_id, skill_id, roll, prev_sl))
 		lbl.text = "Lv. " + str(lvl) + "   |   " + boost_desc
 		
 		row.add_child(lbl)
@@ -601,14 +631,14 @@ func _refresh_upgrade_dialog() -> void:
 	var cost_lbl := $DetailOverlay/UpgradeDialog/DialogPanel/CostHBox/CostLbl
 	
 	if current_level >= SaveManager.UPGRADE_MAX_LEVEL:
-		cost_lbl.text = "Max Level"
+		cost_lbl.text = tr("Max Level")
 		level_up_btn.disabled = true
-		level_up_btn.text = "MAX LEVEL"
+		level_up_btn.text = tr("MAX LEVEL")
 	else:
 		var cost = 10 * (current_level + 1)
 		cost_lbl.text = "💰 " + str(cost)
 		level_up_btn.disabled = SaveManager.get_coins() < cost
-		level_up_btn.text = "LEVEL UP"
+		level_up_btn.text = tr("LEVEL UP")
 
 func _on_level_up_pressed() -> void:
 	if _detail_card_index == -1:
@@ -705,13 +735,27 @@ func _refresh_action_bar() -> void:
 	var is_active: bool = (SaveManager.get_active_index() == _current_index)
 	var is_full: bool = (_working_deck.size() == DECK_SIZE)
 	var set_btn: Button = $ActionBar/SetActiveBtn
+	var clear_btn: Button = $ActionBar/ClearNonDefaultBtn
 	var save_btn: Button = $ActionBar/SaveBtn
 	var cancel_btn: Button = $ActionBar/CancelBtn
+	
+	# SetActive button
 	set_btn.disabled = is_active or not is_full
-	set_btn.text = "[ACTIVE]" if is_active else "Set Active"
+	set_btn.text = tr("[ACTIVE]") if is_active else tr("Set Active")
 	_style_btn(set_btn, Color(0.10, 0.62, 0.25, 1.0) if (not is_active and is_full) else Color(0.45, 0.55, 0.70, 1.0))
+	
+	# Save button — always visible, disabled when deck not full
 	save_btn.disabled = not is_full
-	_style_btn(save_btn, Color(0.10, 0.62, 0.25, 1.0) if is_full else Color(0.45, 0.55, 0.70, 1.0))
+	save_btn.text = tr("Save")
+	save_btn.tooltip_text = "" if is_full else tr("Must have exactly %d characters to save") % DECK_SIZE
+	_style_btn(save_btn, Color(0.10, 0.48, 0.82, 1.0) if is_full else Color(0.45, 0.55, 0.70, 1.0))
+	
+	# Clear Extra button
+	clear_btn.text = tr("Clear Extra")
+	_style_btn(clear_btn, Color(0.72, 0.25, 0.18, 1.0))
+	
+	# Cancel button (hidden — kept for compat)
+	cancel_btn.text = tr("Cancel")
 	_style_btn(cancel_btn, Color(0.72, 0.25, 0.18, 1.0))
 
 func _style_btn(btn: Button, color: Color) -> void:
@@ -739,13 +783,13 @@ func _refresh_selector_buttons() -> void:
 		btn.add_theme_stylebox_override("normal", sbf)
 		btn.add_theme_stylebox_override("hover", sbf)
 		btn.add_theme_stylebox_override("pressed", sbf)
-		btn.text = "Deck " + str(i) + (" [ACTIVE]" if i == active_idx else "")
+		btn.text = tr("Deck") + " " + str(i) + (" " + tr("[ACTIVE]") if i == active_idx else "")
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 func _short_name(card_id: String) -> String:
 	var data: Dictionary = CardDatabase.CARDS.get(card_id, {})
-	var display: String = data.get("name", card_id)
+	var display: String = tr(data.get("name", card_id))
 	if display.length() > 10:
 		return display.substr(0, 9) + "."
 	return display
@@ -765,3 +809,51 @@ func _is_button_in_deck(button_index: int, _card_id: String) -> bool:
 
 func _on_back() -> void:
 	SceneManager.go_to_lobby()
+
+func _on_clear_non_default_pressed() -> void:
+	SaveManager.clear_non_default_cards()
+	_update_sorted_owned_cards()
+	_load_working_deck()
+	_build_collection_grid()
+	_refresh_deck_ui()
+	_refresh_collection_highlights()
+	_refresh_action_bar()
+
+func _init_stat_calc_labels() -> void:
+	for box_name in ["CostBox", "AtkBox", "HpBox"]:
+		var box = get_node("DetailOverlay/MainDetailView/InfoPanel/StatsHBox/" + box_name)
+		if box:
+			var calc = RichTextLabel.new()
+			calc.name = "Calc"
+			calc.bbcode_enabled = true
+			calc.fit_content = true
+			calc.scroll_active = false
+			calc.autowrap_mode = TextServer.AUTOWRAP_OFF
+			calc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			calc.add_theme_font_size_override("normal_font_size", 10)
+			calc.add_theme_color_override("default_color", Color(0.6, 0.7, 0.85, 1.0))
+			box.add_child(calc)
+
+func _update_stat_box(box_name: String, base_val: int, eff_val: int) -> void:
+	var box = get_node("DetailOverlay/MainDetailView/InfoPanel/StatsHBox/" + box_name)
+	if not box:
+		return
+	var val_lbl = box.get_node("Val") as Label
+	var calc_lbl = box.get_node_or_null("Calc") as RichTextLabel
+	
+	# Set total value text
+	val_lbl.text = str(eff_val)
+	
+	var diff = eff_val - base_val
+	if calc_lbl:
+		if diff != 0:
+			# Upgraded/modified: highlight the total value and display base + upgrade
+			val_lbl.add_theme_color_override("font_color", Color(0.28, 0.65, 1.0, 1.0)) # Cyan
+			var sign_char = "+" if diff > 0 else ""
+			var diff_color = "#48a0ff" if diff > 0 else "#ff594d"
+			calc_lbl.text = "[center]%d[color=%s]%s%d[/color][/center]" % [base_val, diff_color, sign_char, diff]
+		else:
+			# No change: restore default font color and display "--"
+			val_lbl.remove_theme_color_override("font_color")
+			calc_lbl.text = "[center]--[/center]"
+

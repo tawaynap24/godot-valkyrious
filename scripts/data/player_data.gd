@@ -28,6 +28,8 @@ class_name PlayerData
 @export var individual_card_levels: Dictionary = {}  # instance_idx (String) -> level (int)
 @export var card_upgrades: Dictionary = {}            # instance_idx (String) -> upgrades path (Dictionary)
 @export var data_version: int = 0
+@export var locale: String = "th"
+
 
 func get_deck(index: int) -> Array[String]:
 	match index:

@@ -1,22 +1,43 @@
-[gd_resource type="Resource" script_class="CharacterStat" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CharacterStat" format=3]
 
 [ext_resource type="Script" path="res://scripts/data/character_stat.gd" id="1_stat"]
+[ext_resource type="Script" path="res://scripts/data/character_status.gd" id="2_status"]
+[ext_resource type="Script" path="res://scripts/data/character_skill.gd" id="3_skill"]
+[ext_resource type="Script" path="res://scripts/data/character_appearance.gd" id="4_appearance"]
+[ext_resource type="Script" path="res://scripts/data/character_timings.gd" id="5_timings"]
+
+[sub_resource type="Resource" id="Appearance_1"]
+script = ExtResource("4_appearance")
+has_image = true
+image_path = "res://assets/characters/natasha/character_natasha_cover_card.png"
+
+[sub_resource type="Resource" id="Skill_1"]
+script = ExtResource("3_skill")
+skills = Array[String](["stun_lowest_countdown"])
+skill_triggers = Array[String](["place"])
+skill_name = "SKILL_NATASHA_NAME"
+skill_description = "SKILL_NATASHA_DESC"
+name_key = "SKILL_NATASHA_NAME"
+description_key = "SKILL_NATASHA_DESC"
+skill_level_values = [4, 5, 6, 7]
+
+[sub_resource type="Resource" id="Status_1"]
+script = ExtResource("2_status")
+cost = 5
+atk = 5
+hp = 6
+
+[sub_resource type="Resource" id="Timings_1"]
+script = ExtResource("5_timings")
 
 [resource]
 script = ExtResource("1_stat")
 card_id = "natasha"
-char_name = "Natasha"
-level = 1
-cost = 5
-atk = 5
-hp = 6
-has_image = true
-image_path = "res://assets/characters/natasha/character_natasha_cover_card.png"
-bg_color = Color(0.15, 0.15, 0.35, 1)
-delay_place = 0.0
-delay_attack = 0.5
-delay_move = 0.5
-move_countdown = 8.0
-capture_duration = 4.0
-skills = ["stun_lowest_countdown"]
-skill_triggers = ["place"]
+char_name = "CHAR_NATASHA_NAME"
+name_key = "CHAR_NATASHA_NAME"
+description_key = "CHAR_NATASHA_DESC"
+status = SubResource("Status_1")
+skill = SubResource("Skill_1")
+appearance = SubResource("Appearance_1")
+timings = SubResource("Timings_1")
+stat_adjusted = true

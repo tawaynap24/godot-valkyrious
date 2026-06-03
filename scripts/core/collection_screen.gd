@@ -30,9 +30,9 @@ func _on_back() -> void:
 
 func _build_filter_bar() -> void:
 	var bar: HBoxContainer = $FilterBar
-	_add_filter_btn(bar, "ทั้งหมด", -1)
+	_add_filter_btn(bar, tr("UI_ALL"), -1)
 	for i in range(CardDatabase.RARITY_NAMES.size()):
-		_add_filter_btn(bar, CardDatabase.RARITY_NAMES[i], i)
+		_add_filter_btn(bar, tr(CardDatabase.RARITY_NAMES[i]), i)
 
 func _add_filter_btn(bar: HBoxContainer, label: String, rarity: int) -> void:
 	var btn := Button.new()
@@ -87,7 +87,7 @@ func _apply_filter() -> void:
 		if empty_lbl == null:
 			empty_lbl = Label.new()
 			empty_lbl.name = "EmptyLabel"
-			empty_lbl.text = "ไม่มีตัวละครที่ตรงกับตัวกรองนี้"
+			empty_lbl.text = tr("UI_NO_CHARACTERS_MATCH")
 			empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			empty_lbl.add_theme_color_override("font_color", Color(0.5, 0.45, 0.65, 1.0))
 			empty_lbl.add_theme_font_size_override("font_size", 14)
@@ -131,7 +131,7 @@ func _add_card_button(grid: GridContainer, card_id: String, data: Dictionary) ->
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	btn.add_child(bar)
 	var lbl := Label.new()
-	var display_name: String = data.get("name", card_id)
+	var display_name: String = tr(data.get("name", card_id))
 	lbl.text = (display_name + "\n"
 		+ "⚔" + str(data.get("atk", "?"))
 		+ " ❤" + str(data.get("hp", "?"))
@@ -175,17 +175,17 @@ func _show_detail(data: Dictionary) -> void:
 			img.visible = false
 	else:
 		img.visible = false
-	$DetailOverlay/CardPanel/NameLabel.text = data.get("name", "")
+	$DetailOverlay/CardPanel/NameLabel.text = tr(data.get("name", ""))
 	var r_lbl: Label = $DetailOverlay/CardPanel/RarityLabel
-	r_lbl.text = "◆  " + CardDatabase.RARITY_NAMES[rarity]
+	r_lbl.text = "◆  " + tr(CardDatabase.RARITY_NAMES[rarity])
 	r_lbl.add_theme_color_override("font_color", CardDatabase.RARITY_COLORS[rarity])
 	$DetailOverlay/CardPanel/StatsLabel.text = (
-		"⚔ ATK  " + str(data.get("atk", "?"))
-		+ "    ❤ HP  " + str(data.get("hp", "?"))
-		+ "    💰 Cost  " + str(data.get("cost", "?"))
+		tr("UI_ATK_HEADER") + str(data.get("atk", "?"))
+		+ "    " + tr("UI_HP_HEADER") + str(data.get("hp", "?"))
+		+ "    " + tr("UI_COST_HEADER") + str(data.get("cost", "?"))
 	)
 	var desc: String = data.get("description", "")
-	$DetailOverlay/CardPanel/DescLabel.text = desc if desc != "" else "ยังไม่มีคำอธิบาย"
+	$DetailOverlay/CardPanel/DescLabel.text = tr(desc) if desc != "" else tr("UI_NO_DESCRIPTION")
 	var skills: Array = data.get("skills", [])
 	var skills_text: String = "—"
 	if not skills.is_empty():
@@ -193,7 +193,7 @@ func _show_detail(data: Dictionary) -> void:
 		for s in skills:
 			parts.append(str(s))
 		skills_text = "  •  ".join(parts)
-	$DetailOverlay/CardPanel/SkillsLabel.text = "Skills:  " + skills_text
+	$DetailOverlay/CardPanel/SkillsLabel.text = tr("UI_SKILLS_HEADER") + skills_text
 	$DetailOverlay.visible = true
 
 func _on_close_detail() -> void:

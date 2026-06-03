@@ -11,6 +11,12 @@ func execute(card, resolver) -> void:
 			enemies.append(fc)
 	if enemies.is_empty():
 		return
+	var skill_lvl = card.card_data.get("skill_level", 1)
+	var skill_values = card.card_data.get("skill_level_values", [])
+	var duration = 3.0
+	if not skill_values.is_empty():
+		var idx = clamp(skill_lvl - 1, 0, skill_values.size() - 1)
+		duration = float(skill_values[idx])
 	var target = enemies[randi() % enemies.size()]
-	print("[Skill] stun_enemy → %s (3s stun)" % target.card_data.get("name", "?"))
-	target.set_stun(3.0)
+	print("[Skill] stun_enemy → %s (%.1fs stun)" % [target.card_data.get("name", "?"), duration])
+	target.set_stun(duration)

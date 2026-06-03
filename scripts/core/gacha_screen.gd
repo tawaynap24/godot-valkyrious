@@ -171,7 +171,7 @@ func _add_card(parent: Control, result: Dictionary, pos: Vector2, sz: Vector2) -
 
 	var font_sz: int = 12 if sz.y > 100.0 else 10
 	var name_lbl := Label.new()
-	name_lbl.text = result.get("name", "?")
+	name_lbl.text = tr(result.get("name", "?"))
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	name_lbl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -184,7 +184,7 @@ func _add_card(parent: Control, result: Dictionary, pos: Vector2, sz: Vector2) -
 	# NEW badge
 	if is_new:
 		var new_lbl := Label.new()
-		new_lbl.text = "NEW!"
+		new_lbl.text = tr("UI_NEW")
 		new_lbl.position = Vector2(3.0, 2.0)
 		new_lbl.add_theme_font_size_override("font_size", 10)
 		new_lbl.add_theme_color_override("font_color", Color(0.18, 1.0, 0.32, 1.0))
@@ -196,7 +196,7 @@ func _add_card(parent: Control, result: Dictionary, pos: Vector2, sz: Vector2) -
 
 	# Rarity tag (top-right)
 	var tag_lbl := Label.new()
-	tag_lbl.text = CardDatabase.RARITY_NAMES[rarity]
+	tag_lbl.text = tr(CardDatabase.RARITY_NAMES[rarity])
 	tag_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	tag_lbl.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	tag_lbl.offset_left  = -54.0

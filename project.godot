@@ -23,6 +23,7 @@ GameCache="*res://scripts/autoload/game_cache.gd"
 NetworkManager="*res://scripts/autoload/network_manager.gd"
 BattleLogger="*res://scripts/autoload/battle_logger.gd"
 UIShell="*res://scripts/autoload/ui_shell.gd"
+LocalizationSettings="*res://scripts/autoload/localization_settings.gd"
 
 [display]
 
@@ -46,3 +47,9 @@ pointing/emulate_touch_from_mouse=true
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://data/localization/translations.en.en.translation", "res://data/localization/translations.th.th.translation")
+
+

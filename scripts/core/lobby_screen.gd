@@ -90,7 +90,7 @@ func _build_history_list() -> void:
 	var history := SaveManager.get_battle_history()
 	if history.is_empty():
 		var empty_lbl := Label.new()
-		empty_lbl.text = "ยังไม่มีประวัติการต่อสู้"
+		empty_lbl.text = tr("UI_NO_BATTLE_HISTORY")
 		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty_lbl.add_theme_font_size_override("font_size", 16)
 		empty_lbl.add_theme_color_override("font_color", Color(0.6, 0.7, 0.85, 1.0))
@@ -129,9 +129,9 @@ func _make_history_row(result: String, opponent: String, mode: String, unix_time
 	badge.anchor_bottom = 1.0
 	badge.offset_right = 80.0
 	match result:
-		"win":  badge.text = "WIN";  badge.add_theme_color_override("font_color", Color(0.28, 1.0, 0.50, 1.0))
-		"loss": badge.text = "LOSS"; badge.add_theme_color_override("font_color", Color(1.0, 0.35, 0.30, 1.0))
-		"draw": badge.text = "DRAW"; badge.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78, 1.0))
+		"win":  badge.text = tr("UI_WIN");  badge.add_theme_color_override("font_color", Color(0.28, 1.0, 0.50, 1.0))
+		"loss": badge.text = tr("UI_LOSS"); badge.add_theme_color_override("font_color", Color(1.0, 0.35, 0.30, 1.0))
+		"draw": badge.text = tr("UI_DRAW_SHORT"); badge.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78, 1.0))
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	badge.add_theme_font_size_override("font_size", 14)
@@ -153,7 +153,7 @@ func _make_history_row(result: String, opponent: String, mode: String, unix_time
 
 	# Mode tag — lower half, from x=86
 	var mode_lbl := Label.new()
-	mode_lbl.text = "[Online]" if mode == "online" else "[AI]"
+	mode_lbl.text = tr("UI_ONLINE") if mode == "online" else tr("UI_AI")
 	mode_lbl.offset_left = 86.0
 	mode_lbl.offset_top = 36.0
 	mode_lbl.offset_right = 240.0
@@ -193,7 +193,7 @@ func _make_history_row(result: String, opponent: String, mode: String, unix_time
 
 func _refresh_profile_display() -> void:
 	var pname := SaveManager.get_player_name()
-	$PlayerNameLabel.text = pname if pname != "" else "Player"
+	$PlayerNameLabel.text = pname if pname != "" else tr("UI_PLAYER")
 	var icon_id := SaveManager.get_profile_icon()
 	var has_icon := _load_icon_into($ProfileBtn/ProfileIconRect, icon_id)
 	$ProfileBtn/ProfileIconRect.visible = has_icon
@@ -213,7 +213,7 @@ func _open_profile_editor(force: bool) -> void:
 	var ed := $ProfileEditorPanel/EditorCard
 	(ed.get_node("NameEdit") as LineEdit).text = SaveManager.get_player_name()
 	ed.get_node("NameFeedbackLabel").visible = false
-	(ed.get_node("EditorTitle") as Label).text = "ตั้งชื่อผู้เล่น" if force else "แก้ไขโปรไฟล์"
+	(ed.get_node("EditorTitle") as Label).text = tr("UI_SET_PLAYER_NAME") if force else tr("UI_EDIT_PROFILE")
 	ed.get_node("CancelProfileBtn").visible = not force
 	_update_editor_icon_preview(_pending_icon)
 	$ProfileEditorPanel.visible = true
@@ -292,7 +292,7 @@ func _build_picker_grid() -> void:
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		btn.add_child(bar)
 		var lbl := Label.new()
-		lbl.text = cdata.get("name", card_id)
+		lbl.text = tr(cdata.get("name", card_id))
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		lbl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)

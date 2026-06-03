@@ -9,7 +9,7 @@ extends Node
 var CARDS: Dictionary = {}
 
 # ── Rarity display constants (single source of truth) ─────────────────────────
-const RARITY_NAMES: Array[String] = ["Bronze", "Silver", "Gold"]
+const RARITY_NAMES: Array[String] = ["UI_BRONZE", "UI_SILVER", "UI_GOLD"]
 const RARITY_COLORS: Array[Color] = [
 	Color(0.80, 0.50, 0.18, 1.0),  # Bronze
 	Color(0.78, 0.78, 0.82, 1.0),  # Silver
@@ -45,27 +45,38 @@ func _load_all() -> void:
 
 func _stat_to_dict(s: CharacterStat) -> Dictionary:
 	var id: String = s.card_id if s.card_id != "" else s.char_name.to_lower()
+	var name_val = s.name_key if s.name_key != "" else s.char_name
+	var desc_val = s.description_key if s.description_key != "" else s.appearance.description
+	var skill_name_val = s.skill.name_key if (s.skill != null and s.skill.name_key != "") else (s.skill.skill_name if s.skill != null else "")
+	var skill_desc_val = s.skill.description_key if (s.skill != null and s.skill.description_key != "") else (s.skill.skill_description if s.skill != null else "")
+
 	return {
 		"id": id,
-		"name": s.char_name,
+		"name": name_val,
 		"rarity": s.rarity,
 		"level": s.level,
-		"cost": s.cost,
-		"atk": s.atk,
-		"hp": s.hp,
-		"description": s.description,
-		"skills": s.skills.duplicate(),
-		"skill_triggers": s.skill_triggers.duplicate(),
+		"cost": s.status.cost,
+		"atk": s.status.atk,
+		"hp": s.status.hp,
+		"skill_level": 1,
+		"skill_name": skill_name_val,
+		"skill_description": skill_desc_val,
+		"skill_level_values": s.skill.skill_level_values.duplicate() if s.skill != null else [],
+		"skill_params": s.skill.skill_params.duplicate() if s.skill != null else {},
+		"stat_adjusted": s.stat_adjusted,
+		"description": desc_val,
+		"skills": s.skill.skills.duplicate() if s.skill != null else [] as Array[String],
+		"skill_triggers": s.skill.skill_triggers.duplicate() if s.skill != null else [] as Array[String],
 		"has_barrier": s.has_barrier,
-		"has_image": s.has_image,
-		"image_path": s.image_path,
-		"bg_color": s.bg_color,
+		"has_image": s.appearance.has_image if s.appearance != null else false,
+		"image_path": s.appearance.image_path if s.appearance != null else "",
+		"bg_color": s.appearance.bg_color if s.appearance != null else Color(0.15, 0.15, 0.35, 1.0),
 		"time_delay": {
-			"place": s.delay_place,
-			"attack": s.delay_attack,
-			"move": s.delay_move,
-			"move_countdown": s.move_countdown,
-			"capture_duration": s.capture_duration,
+			"place": s.timings.delay_place if s.timings != null else 0.0,
+			"attack": s.timings.delay_attack if s.timings != null else 0.5,
+			"move": s.timings.delay_move if s.timings != null else 0.5,
+			"move_countdown": s.timings.move_countdown if s.timings != null else 8.0,
+			"capture_duration": s.timings.capture_duration if s.timings != null else 4.0,
 		},
 	}
 
@@ -90,4 +101,20 @@ func get_effective_dict(card_id: String) -> Dictionary:
 	d["level"] = level
 	d["atk"] = base.get("atk", 1) + (level - 1)
 	d["hp"]  = base.get("hp",  1) + (level - 1)
+	d["skill_level"] = 1
 	return d
+
+func get_scaled_skill_desc(card_id: String, template: String, skill_level: int) -> String:
+	if template == "":
+		return tr("UI_NO_PASSIVE_SKILL")
+	var base = CARDS.get(card_id, {})
+	var values: Array = base.get("skill_level_values", [])
+	var translated_template = tr(template)
+	if values.is_empty():
+		return translated_template
+	var idx = clamp(skill_level - 1, 0, values.size() - 1)
+	var val = values[idx]
+	if val is Array:
+		return translated_template % val
+	else:
+		return translated_template % val

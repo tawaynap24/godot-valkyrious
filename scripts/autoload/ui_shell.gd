@@ -8,6 +8,7 @@ var _layer = null
 var _coins_lbl = null
 var _tab_btns = {}
 var _active_tab = ""
+var _lang_btn = null
 
 func _ready():
 	_build_shell()
@@ -32,6 +33,7 @@ func _build_header():
 	_coins_lbl.add_theme_color_override("font_color", Color(1.00, 0.82, 0.20, 1.0))
 	_coins_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layer.add_child(_coins_lbl)
+	
 	var tl = Label.new()
 	tl.text = "✦ Valkyrious"
 	tl.anchor_left = 0.0; tl.anchor_right = 1.0; tl.anchor_top = 0.0; tl.anchor_bottom = 0.0
@@ -43,7 +45,65 @@ func _build_header():
 	tl.add_theme_color_override("font_color", Color(0.82, 0.70, 1.0, 1.0))
 	tl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layer.add_child(tl)
+
+	# Language toggle button in the middle space of header
+	_lang_btn = Button.new()
+	_lang_btn.anchor_left = 0.0; _lang_btn.anchor_right = 0.0
+	_lang_btn.offset_left = 280.0; _lang_btn.offset_right = 345.0
+	_lang_btn.offset_top = 13.0; _lang_btn.offset_bottom = 43.0
+	_lang_btn.add_theme_font_size_override("font_size", 12)
+	_style_lang_btn(_lang_btn)
+	_lang_btn.pressed.connect(_on_lang_pressed)
+	_layer.add_child(_lang_btn)
+	_update_lang_btn_text()
+
 	refresh_coins()
+
+func _style_lang_btn(btn):
+	var sbf = StyleBoxFlat.new()
+	sbf.bg_color = Color(0.12, 0.48, 0.92, 0.15)
+	sbf.border_width_bottom = 1
+	sbf.border_width_top = 1
+	sbf.border_width_left = 1
+	sbf.border_width_right = 1
+	sbf.border_color = Color(0.82, 0.70, 1.0, 0.5)
+	sbf.set_corner_radius_all(6)
+	btn.add_theme_stylebox_override("normal", sbf)
+	var sbf_h = sbf.duplicate()
+	sbf_h.bg_color = Color(0.12, 0.48, 0.92, 0.4)
+	btn.add_theme_stylebox_override("hover", sbf_h)
+	btn.add_theme_stylebox_override("pressed", sbf_h)
+	btn.add_theme_color_override("font_color", Color(0.82, 0.70, 1.0, 1.0))
+
+func _update_lang_btn_text():
+	if _lang_btn:
+		var cur = SaveManager.get_locale()
+		if cur == "th":
+			_lang_btn.text = "🇹🇭 TH"
+		else:
+			_lang_btn.text = "🇬🇧 EN"
+
+func _on_lang_pressed():
+	var cur = SaveManager.get_locale()
+	var next = "en" if cur == "th" else "th"
+	SaveManager.set_locale(next)
+	_update_lang_btn_text()
+	_rebuild_footer_texts()
+	get_tree().reload_current_scene()
+
+func _rebuild_footer_texts():
+	var TABS = [
+		["shop", "🛒", "UI_SHOP"],
+		["deck", "🃏", "UI_DECK"],
+		["battle", "⚔", "UI_BATTLE"],
+		["records", "🏆", "UI_RECORDS"],
+		["gacha", "✨", "UI_GACHA"],
+	]
+	for i in range(TABS.size()):
+		var tab_id = TABS[i][0]
+		var btn = _tab_btns.get(tab_id)
+		if btn:
+			btn.text = TABS[i][1] + "\n" + tr(TABS[i][2])
 
 func _build_footer():
 	var bg = ColorRect.new()
@@ -52,24 +112,26 @@ func _build_footer():
 	bg.offset_top = -FOOTER_H; bg.offset_bottom = 0.0
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layer.add_child(bg)
+	
 	var sep = ColorRect.new()
 	sep.color = Color(0.55, 0.35, 0.95, 0.45)
 	sep.anchor_left = 0.0; sep.anchor_right = 1.0; sep.anchor_top = 1.0; sep.anchor_bottom = 1.0
 	sep.offset_top = -FOOTER_H; sep.offset_bottom = -FOOTER_H + 2.0
 	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_layer.add_child(sep)
+	
 	var TABS = [
-		["shop", "🛒", "ร้านค้า"],
-		["deck", "🃏", "ทีม"],
-		["battle", "⚔", "ต่อสู้"],
-		["records", "🏆", "บันทึก"],
-		["gacha", "✨", "Gacha"],
+		["shop", "🛒", "UI_SHOP"],
+		["deck", "🃏", "UI_DECK"],
+		["battle", "⚔", "UI_BATTLE"],
+		["records", "🏆", "UI_RECORDS"],
+		["gacha", "✨", "UI_GACHA"],
 	]
 	var tab_w = VP_W / float(TABS.size())
 	for i in range(TABS.size()):
 		var tab_id = TABS[i][0]
 		var btn = Button.new()
-		btn.text = TABS[i][1] + "\n" + TABS[i][2]
+		btn.text = TABS[i][1] + "\n" + tr(TABS[i][2])
 		btn.anchor_left = 0.0; btn.anchor_right = 0.0; btn.anchor_top = 1.0; btn.anchor_bottom = 1.0
 		btn.offset_left = float(i) * tab_w
 		btn.offset_right = float(i + 1) * tab_w
@@ -107,6 +169,7 @@ func set_active_tab(tab_id):
 	_active_tab = tab_id
 	for tid in _tab_btns:
 		_style_tab_btn(_tab_btns[tid], tid == tab_id)
+	_rebuild_footer_texts() # Refresh tab texts in current locale
 	refresh_coins()
 
 func refresh_coins():
@@ -121,6 +184,8 @@ func hide_shell():
 func show_shell():
 	if _layer:
 		_layer.visible = true
+		_update_lang_btn_text()
+		_rebuild_footer_texts()
 		refresh_coins()
 	_set_canvas_offset(Vector2(0.0, HEADER_H))
 

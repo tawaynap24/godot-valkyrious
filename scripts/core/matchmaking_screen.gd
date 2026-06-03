@@ -55,17 +55,18 @@ func _set_state(s: State) -> void:
 
 	match s:
 		State.IDLE:
-			_set_status("เลือกวิธีการเล่น")
+			_set_status(tr("UI_SELECT_PLAY_MODE"))
 		State.CONNECTING:
-			_set_status("กำลังเชื่อมต่อเซิร์ฟเวอร์…")
+			_set_status(tr("UI_CONNECTING_TO_SERVER"))
 		State.CREATE_WAIT:
-			_set_status("รอผู้เล่นอื่นเข้าร่วม…")
+			_set_status(tr("UI_WAITING_FOR_OTHER_PLAYERS"))
 		State.JOIN_WAIT:
-			_set_status("กำลังเข้าห้อง…")
+			_set_status(tr("UI_ENTERING_ROOM"))
 		State.RANDOM_WAIT:
-			_set_status("กำลังหาคู่ต่อสู้…")
+			_set_status(tr("UI_SEARCHING_FOR_OPPONENT"))
 		State.MATCHED:
-			_set_status("พบคู่แล้ว! กำลังเริ่มเกม…")
+			_set_status(tr("UI_MATCH_FOUND"))
+
 
 func _set_status(text: String) -> void:
 	$StatusPanel/StatusLabel.text = text
@@ -83,7 +84,7 @@ func _on_create_room() -> void:
 func _on_join_room() -> void:
 	var code: String = $JoinSection/CodeInput.text.strip_edges()
 	if code.length() < 4:
-		_set_status("กรอก Room Code 4 ตัวอักษร")
+		_set_status(tr("UI_ENTER_ROOM_CODE"))
 		return
 	_pending_action = "join:" + code.to_upper()
 	_connect_then_act()
@@ -124,10 +125,10 @@ func _on_connected() -> void:
 func _on_disconnected() -> void:
 	if _state != State.MATCHED:
 		_set_state(State.IDLE)
-		_set_status("การเชื่อมต่อขาดหาย")
+		_set_status(tr("ERROR_CONNECTION_LOST"))
 
 func _on_room_created(code: String) -> void:
-	$RoomCodePanel/RoomCodeLabel.text = "Room Code\n%s" % code
+	$RoomCodePanel/RoomCodeLabel.text = tr("UI_ROOM_CODE") + "\n" + code
 	_set_state(State.CREATE_WAIT)
 
 func _on_waiting() -> void:
@@ -139,5 +140,5 @@ func _on_match_found(_role: String, _seed: int) -> void:
 	SceneManager.go_to_battle_online()
 
 func _on_error(message: String) -> void:
-	_set_status("ข้อผิดพลาด: " + message)
+	_set_status(tr("ERROR_PREFIX") + tr(message))
 	_set_state(State.IDLE)

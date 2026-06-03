@@ -4,8 +4,6 @@ class_name SkillDeathBurst
 # On removal: fires a projectile dealing `damage` HP to a random enemy.
 # Trigger: "remove"
 
-@export var damage: int = 3
-
 func execute(card, resolver) -> void:
 	var enemies: Array = []
 	for fc in resolver.field_cards:
@@ -13,11 +11,19 @@ func execute(card, resolver) -> void:
 			enemies.append(fc)
 	if enemies.is_empty():
 		return
+	var skill_params = card.card_data.get("skill_params", {})
+	var skill_lvl = card.card_data.get("skill_level", 1)
+	var skill_values = card.card_data.get("skill_level_values", [])
+	var dynamic_damage: int = int(skill_params.get("base_damage", 3))
+	if not skill_values.is_empty():
+		var idx = clamp(skill_lvl - 1, 0, skill_values.size() - 1)
+		dynamic_damage = int(skill_values[idx])
+	var pause_dur: float = float(skill_params.get("pause_duration", 1.2))
 	var target = enemies[randi() % enemies.size()]
 	var from_pos: Vector2 = card.global_position
-	print("[Skill] death_burst → %s (-%d HP)" % [target.card_data.get("name", "?"), damage])
-	resolver.add_pause(1.2)
-	_launch_projectile(from_pos, target, damage, resolver)
+	print("[Skill] death_burst → %s (-%d HP)" % [target.card_data.get("name", "?"), dynamic_damage])
+	resolver.add_pause(pause_dur)
+	_launch_projectile(from_pos, target, dynamic_damage, resolver)
 
 func _launch_projectile(from_pos: Vector2, target, damage: int, resolver) -> void:
 	var proj := Node2D.new()

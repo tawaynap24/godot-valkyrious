@@ -54,7 +54,7 @@ func _init_online_mode() -> void:
 
 func _init_profiles() -> void:
 	var pname := SaveManager.get_player_name()
-	$ControlsBar/OwnerNameLabel.text = pname if pname != "" else "Player"
+	$ControlsBar/OwnerNameLabel.text = pname if pname != "" else tr("UI_PLAYER")
 	_apply_icon($ControlsBar/OwnerIconRect, SaveManager.get_profile_icon())
 	_shift_name_for_icon($ControlsBar/OwnerNameLabel, $ControlsBar/OwnerIconRect)
 	if not is_online_mode:
@@ -129,14 +129,17 @@ func end_game(won: bool) -> void:
 	BattleLogger.end_battle(_result)
 	SaveManager.record_battle(_result, _opponent_display_name, _mode)
 
-func _show_result(won: bool) -> void:
+func _show_result(is_owner_win: bool) -> void:
 	var overlay = $GameOverOverlay
+	var bg = overlay.get_node("Background")
 	var label: Label = overlay.get_node("ResultLabel")
-	if won:
-		label.text = "ชนะ!"
-		label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2, 1.0))
+	if is_owner_win:
+		bg.color = Color(0.12, 0.42, 0.22, 0.95)
+		label.text = tr("UI_VICTORY")
+		label.add_theme_color_override("font_color", Color(0.28, 1.0, 0.50, 1.0))
 	else:
-		label.text = "แพ้"
+		bg.color = Color(0.48, 0.12, 0.12, 0.95)
+		label.text = tr("UI_DEFEAT")
 		label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.2, 1.0))
 	overlay.visible = true
 
@@ -150,7 +153,7 @@ func draw_game() -> void:
 		NetworkManager.send_game_over("draw")
 	var overlay = $GameOverOverlay
 	var label: Label = overlay.get_node("ResultLabel")
-	label.text = "เสมอ"
+	label.text = tr("UI_DRAW")
 	label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85, 1.0))
 	overlay.visible = true
 	var _mode := "online" if is_online_mode else "ai"
